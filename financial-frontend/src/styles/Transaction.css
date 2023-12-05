@@ -1,0 +1,43 @@
+.Transaction {
+  padding: 1.5% 2.5%;
+  display: flex;
+  align-items: center;
+  gap: 5%;
+  min-width: 405px;
+  max-width: 405px;
+  min-height: 7vh;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.Transaction-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Transaction-data p {
+  font-size: 0.7rem;
+  width: 80px;
+}
+
+.Transaction-data .name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.heading {
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-decoration-skip-ink: auto;
+  text-underline-position: under;
+  font-weight: 500;
+  /* color: #6c3428; */
+}
+
+.Transaction-handlerBtn {
+  border: none;
+  /* background-color: inherit; */
+}
