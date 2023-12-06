@@ -1,17 +1,13 @@
 .TransactionsContainer {
   margin: 1.5%;
-  padding: 0.5%;
+  padding: 5px;
 
-  width: 500px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
-  gap: 3%;
+  gap: 10px;
 }
 
-.data {
-  background-color: #b0926a;
-  color: #fae7c9;
-  margin-bottom: -2%;
+.TransactionsContainer h2 {
+  font-family: "Cedarville Cursive", cursive;
 }

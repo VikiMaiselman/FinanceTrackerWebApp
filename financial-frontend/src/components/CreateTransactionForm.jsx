@@ -41,7 +41,7 @@ export default function CreateTransactionForm({ metadata }) {
   };
 
   return (
-    <form className="Transaction CreateTransactionForm">
+    <form className="Transaction TransactionForm">
       <input
         onChange={handleChange}
         name="name"

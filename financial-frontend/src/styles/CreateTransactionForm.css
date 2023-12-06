@@ -1,11 +1,15 @@
-.CreateTransactionForm {
+.TransactionForm {
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #fae7c9;
   min-width: 450px;
-  max-width: 450px;
-  /* gap: 2.5%; */
+}
+
+@media (max-width: 1499px) {
+  .TransactionForm {
+    min-width: 950px;
+  }
 }
 
 .Transaction input {
@@ -15,6 +19,13 @@
   padding: 5px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+@media (max-width: 1499px) {
+  .Transaction input {
+    /* min-width: 950px; */
+    width: 200px;
+  }
 }
 
 .Transaction button {

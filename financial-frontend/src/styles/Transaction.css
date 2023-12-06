@@ -1,29 +1,46 @@
 .Transaction {
   padding: 1.5% 2.5%;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
-  gap: 5%;
-  min-width: 405px;
-  max-width: 405px;
-  min-height: 7vh;
+  gap: 2.5%;
+  min-width: 450px;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
     rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
   border-radius: 5px;
   background-color: #fff;
 }
 
+.less-columns {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 1499px) {
+  .Transaction {
+    min-width: 950px;
+  }
+}
+
 .Transaction-data {
+  margin-left: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 5%;
+  padding: 5px;
 }
 
-.Transaction-data p {
+.data {
+  background-color: #b0926a;
+  color: #fae7c9;
+}
+
+.Transaction p {
   font-size: 0.7rem;
-  width: 80px;
+  min-width: 80px;
 }
 
-.Transaction-data .name {
+.name {
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -34,10 +51,8 @@
   text-decoration-skip-ink: auto;
   text-underline-position: under;
   font-weight: 500;
-  /* color: #6c3428; */
 }
 
 .Transaction-handlerBtn {
   border: none;
-  /* background-color: inherit; */
 }

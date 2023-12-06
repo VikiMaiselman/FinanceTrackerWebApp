@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DoneSharpIcon from "@mui/icons-material/DoneSharp";
 
 export default function UpdateTransactionForm({
   txData,
@@ -39,7 +40,7 @@ export default function UpdateTransactionForm({
   };
 
   return (
-    <form>
+    <form className="Transaction TransactionForm">
       <input onChange={handleChange} name="name" value={tx.name} />
       <input onChange={handleChange} name="sum" value={tx.sum} />
 
@@ -60,7 +61,10 @@ export default function UpdateTransactionForm({
         })}
       </datalist>
 
-      <button onClick={handleClick}>Save</button>
+      <button onClick={handleClick}>
+        <DoneSharpIcon fontSize="small" />
+        Save
+      </button>
     </form>
   );
 }

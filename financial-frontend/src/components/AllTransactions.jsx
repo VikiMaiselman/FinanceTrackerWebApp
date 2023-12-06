@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
+// import { Link } from "react-router-dom";
+import { Grid, createTheme } from "@mui/material";
 import axios from "axios";
 
 import TransactionsContainer from "./TransactionsContainer";
+import AllExpenses from "./AllExpenses";
+import RadialChart from "./RadialChart";
 import "../styles/AllTransactions.css";
 
 const url = "http://localhost:3007";
@@ -9,6 +13,18 @@ const headers = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
+
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1500,
+    },
+  },
+});
 
 export default function AllTransactions() {
   const [financeState, setFinanceState] = useState({
@@ -46,7 +62,6 @@ export default function AllTransactions() {
   }, []);
 
   const addTransaction = async (newTransaction) => {
-    // console.log("newTransaction", newTransaction);
     try {
       await axios.post(url, newTransaction, { withCredentials: true }, headers);
     } catch (error) {
@@ -57,8 +72,6 @@ export default function AllTransactions() {
   };
 
   const updateTransaction = async (transaction, globalId) => {
-    console.log("in Update ", transaction, globalId);
-
     const dataForBackend = {
       transaction: transaction,
       globalId: globalId,
@@ -78,8 +91,6 @@ export default function AllTransactions() {
   };
 
   const removeTransaction = async (transaction, globalId) => {
-    console.log("in Remove ", transaction, globalId);
-
     const dataForBackend = {
       transaction: transaction,
       globalId: globalId,
@@ -103,22 +114,54 @@ export default function AllTransactions() {
     removeTransaction: removeTransaction,
   };
 
+  const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
+  const dataForChart = {
+    total: financeState.generalStructure?.total,
+    subdata:
+      financeState.generalStructure?.types?.map((type, idx) => {
+        return {
+          name: type.name,
+          subtotal:
+            ((type.typeTotal < 0 ? type.typeTotal * -1 : type.typeTotal) *
+              100) /
+            financeState.generalStructure?.total,
+          fill: colorTypes[idx],
+        };
+      }) || [],
+  };
+
   const toRender = financeState.generalStructure ? (
     <div className="AllTransactions">
       <h1>My Total Financial State: {financeState.generalStructure.total}₪</h1>
-
-      <div className="AllTransactions-contents">
+      <div className="MainChart">
+        <RadialChart dataForChart={dataForChart} />
+      </div>
+      <Grid container className="AllTransactions-contents" spacing={8}>
         {financeState.generalStructure.types.map((type) => {
+          const transactionsPerType = financeState.allTransactions.filter(
+            (tx) => tx.typeName === type.name
+          );
           return (
-            <TransactionsContainer
-              key={type._id}
-              financialState={financeState}
-              type={type}
-              actionsWithTransactions={actions}
-            />
+            <Grid
+              className="AllTransaction-content"
+              item
+              theme={theme}
+              lg={12}
+              xl={4}
+            >
+              <TransactionsContainer
+                key={type._id}
+                transactionsToDisplay={transactionsPerType}
+                globalId={financeState.generalStructure._id}
+                // financialState={financeState}
+                type={type}
+                actionsWithTransactions={actions}
+              />
+            </Grid>
           );
         })}
-      </div>
+      </Grid>
+      <AllExpenses financialState={financeState} />
     </div>
   ) : (
     <></>

@@ -6,11 +6,14 @@ import "../styles/Transaction.css";
 
 export default function Transaction({ txData, metadata }) {
   const { name, sum, date, subtypeName } = txData;
-  const { updateTransaction, removeTransaction } =
-    metadata.actionsWithTransactions;
+  const updateTransaction =
+    metadata?.actionsWithTransactions?.updateTransaction;
+  const removeTransaction =
+    metadata?.actionsWithTransactions?.removeTransaction;
 
   const [isEditable, setIsEditable] = useState(false);
 
+  const displayMore = metadata.actionsWithTransactions ? true : false;
   const whatToRender = isEditable ? (
     <UpdateTransactionForm
       txData={txData}
@@ -18,32 +21,33 @@ export default function Transaction({ txData, metadata }) {
       setIsEditable={setIsEditable}
     />
   ) : (
-    <div className="Transaction">
-      <div className="Transaction-data">
-        <p className="name">{name}</p>
-        <p>{sum} ₪</p>
-        <p>{date}</p>
-        <p>({subtypeName})</p>
-      </div>
-      <div className="Transaction-data">
-        <button
-          className="Transaction-handlerBtn"
-          onClick={(event) => {
-            setIsEditable(true);
-            updateTransaction(event);
-          }}
-        >
-          <EditIcon sx={{ color: "#706233" }} />
-        </button>
-        <button
-          className="Transaction-handlerBtn"
-          onClick={(event) => {
-            removeTransaction(txData, metadata.globalId);
-          }}
-        >
-          <DeleteIcon sx={{ color: "#706233" }} />
-        </button>
-      </div>
+    <div className={displayMore ? "Transaction" : "Transaction less-columns"}>
+      <p className="name">{name}</p>
+      <p>{sum} ₪</p>
+      <p>{date}</p>
+      {displayMore && <p>({subtypeName})</p>}
+      {displayMore && (
+        <div className="Transaction-data">
+          <button
+            className="Transaction-handlerBtn"
+            onClick={(event) => {
+              event.preventDefault();
+              setIsEditable(true);
+            }}
+          >
+            <EditIcon sx={{ color: "#706233" }} />
+          </button>
+          <button
+            className="Transaction-handlerBtn"
+            onClick={(event) => {
+              event.preventDefault();
+              removeTransaction?.(txData, metadata.globalId);
+            }}
+          >
+            <DeleteIcon sx={{ color: "#706233" }} />
+          </button>
+        </div>
+      )}
     </div>
   );
 

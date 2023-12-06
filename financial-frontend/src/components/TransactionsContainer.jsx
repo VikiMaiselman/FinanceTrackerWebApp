@@ -4,32 +4,36 @@ import CreateTransactionForm from "./CreateTransactionForm";
 import "../styles/TransactionsContainer.css";
 
 export default function TransactionsContainer({
-  financialState,
+  globalId,
+  transactionsToDisplay,
   type,
   actionsWithTransactions,
 }) {
-  const transactionsPerType = financialState.allTransactions.filter(
-    (tx) => tx.typeName === type.name
-  );
-
   const metadataForNewTransaction = {
-    globalId: financialState.generalStructure._id,
+    globalId: globalId,
     actionsWithTransactions: actionsWithTransactions,
     type: type,
   };
 
+  const displayMore = actionsWithTransactions ? true : false;
+
   return (
     <div className="TransactionsContainer">
-      <div className="Transaction data">
-        <div className="Transaction-data">
-          <p className="heading">Transaction</p>
-          <p className="heading">Sum (in ₪)</p>
-          <p className="heading">Date</p>
-          <p className="heading">Category</p>
-          <p className="heading">Actions</p>
-        </div>
+      <h2>My {type.name}:</h2>
+      <div
+        className={
+            displayMore
+            ? "Transaction data"
+            : "Transaction data less-columns"
+        }
+      >
+        <p className="heading">Transaction</p>
+        <p className="heading">Sum (in ₪)</p>
+        <p className="heading">Date</p>
+        {displayMore && <p className="heading">Category</p>}
+        {displayMore && <p className="heading">Actions</p>}
       </div>
-      {transactionsPerType.map((tx) => {
+      {transactionsToDisplay.map((tx) => {
         return (
           <Transaction
             key={tx._id}
@@ -38,7 +42,9 @@ export default function TransactionsContainer({
           />
         );
       })}
-      <CreateTransactionForm metadata={metadataForNewTransaction} />
+      {actionsWithTransactions && (
+        <CreateTransactionForm metadata={metadataForNewTransaction} />
+      )}
     </div>
   );
 }
