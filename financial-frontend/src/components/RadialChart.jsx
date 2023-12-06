@@ -48,7 +48,6 @@ export default function RadialChart({ dataForChart }) {
         height={80}
         layout="vertical"
         verticalAlign="middle"
-        // iconType="circle"
       />
     </RadialBarChart>
   );

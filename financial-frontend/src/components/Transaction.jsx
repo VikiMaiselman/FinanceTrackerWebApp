@@ -6,8 +6,6 @@ import "../styles/Transaction.css";
 
 export default function Transaction({ txData, metadata }) {
   const { name, sum, date, subtypeName } = txData;
-  const updateTransaction =
-    metadata?.actionsWithTransactions?.updateTransaction;
   const removeTransaction =
     metadata?.actionsWithTransactions?.removeTransaction;
 

@@ -14,7 +14,6 @@ export default function TransactionsContainer({
     actionsWithTransactions: actionsWithTransactions,
     type: type,
   };
-
   const displayMore = actionsWithTransactions ? true : false;
 
   return (

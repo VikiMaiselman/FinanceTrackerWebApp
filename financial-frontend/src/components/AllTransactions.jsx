@@ -153,7 +153,6 @@ export default function AllTransactions() {
                 key={type._id}
                 transactionsToDisplay={transactionsPerType}
                 globalId={financeState.generalStructure._id}
-                // financialState={financeState}
                 type={type}
                 actionsWithTransactions={actions}
               />
