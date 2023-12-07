@@ -11,7 +11,7 @@ export default function RadialChart({ dataForChart }) {
 
   const data = [
     ...dataForChart.subdata,
-    { name: "Current financial state as", subtotal: 100, fill: "#B0926A" },
+    { name: "If total is", subtotal: 100, fill: "#B0926A" },
   ];
   console.log("data", data);
 
@@ -44,7 +44,7 @@ export default function RadialChart({ dataForChart }) {
           };
         })}
         iconSize={15}
-        width={190}
+        width={200}
         height={80}
         layout="vertical"
         verticalAlign="middle"

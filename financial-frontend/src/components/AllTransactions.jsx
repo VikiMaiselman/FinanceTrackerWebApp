@@ -131,37 +131,45 @@ export default function AllTransactions() {
   };
 
   const toRender = financeState.generalStructure ? (
-    <div className="AllTransactions">
-      <h1>My Total Financial State: {financeState.generalStructure.total}₪</h1>
-      <div className="MainChart">
-        <RadialChart dataForChart={dataForChart} />
-      </div>
-      <Grid container className="AllTransactions-contents" spacing={8}>
-        {financeState.generalStructure.types.map((type) => {
-          const transactionsPerType = financeState.allTransactions.filter(
-            (tx) => tx.typeName === type.name
-          );
-          return (
-            <Grid
-              className="AllTransaction-content"
-              item
-              theme={theme}
-              lg={12}
-              xl={4}
-            >
-              <TransactionsContainer
+    <>
+      <div className="AllTransactions">
+        <h1>
+          My Total Financial State: {financeState.generalStructure.total}₪
+        </h1>
+
+        <div className="MainChart">
+          <RadialChart dataForChart={dataForChart} />
+        </div>
+
+        <Grid container className="AllTransactions-contents" spacing={8}>
+          {financeState.generalStructure.types.map((type) => {
+            const transactionsPerType = financeState.allTransactions.filter(
+              (tx) => tx.typeName === type.name
+            );
+            return (
+              <Grid
+                className="AllTransaction-content"
+                item
+                theme={theme}
+                lg={12}
+                xl={4}
                 key={type._id}
-                transactionsToDisplay={transactionsPerType}
-                globalId={financeState.generalStructure._id}
-                type={type}
-                actionsWithTransactions={actions}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
+              >
+                <TransactionsContainer
+                  key={type._id}
+                  transactionsToDisplay={transactionsPerType}
+                  globalId={financeState.generalStructure._id}
+                  type={type}
+                  actionsWithTransactions={actions}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+      </div>
+
       <AllExpenses financialState={financeState} />
-    </div>
+    </>
   ) : (
     <></>
   );

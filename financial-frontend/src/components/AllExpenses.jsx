@@ -1,6 +1,7 @@
 import React from "react";
 import { Grid, createTheme } from "@mui/material";
 import TransactionsContainer from "./TransactionsContainer";
+import CustomPieChart from "./CustomPieChart";
 
 const theme = createTheme({
   breakpoints: {
@@ -18,7 +19,6 @@ export default function AllExpenses({ financialState }) {
   const expensesGeneral = financialState.generalStructure.types.find(
     (type) => type.name === "Expenses"
   );
-  //   console.log("AT", financialState.allTransactions, expensesGeneral);
   const expensesTransactions = financialState.allTransactions.filter(
     (tx) => tx.typeName === "Expenses"
   );
@@ -33,16 +33,23 @@ export default function AllExpenses({ financialState }) {
   };
 
   const dataForChart = {
-    total: expensesGeneral.typeTotal,
+    // total: expensesGeneral.typeTotal !== 0 ? expensesGeneral.typeTotal * (-1) : 0,
     subdata:
       expensesGeneral.subtypes.map((subtype, idx) => {
+        const associatedTx = expensesTransactions.filter(
+          (tx) => tx.subtypeName === subtype.name
+        );
+        const sumForSubtype = associatedTx
+          .flat()
+          .reduce((acc, tx) => acc + tx.sum, 0);
+        console.log(associatedTx, sumForSubtype, "associatedTx");
+
+        if (sumForSubtype === 0) return {};
         return {
+          key: subtype._id,
           name: subtype.name,
-        //   subtotal:
-        //     ((type.typeTotal < 0 ? type.typeTotal * -1 : type.typeTotal) *
-        //       100) /
-        //     financeState.generalStructure?.total,
-        //   fill: colorTypes[idx],
+          subtotal: sumForSubtype,
+          fill: subtype.color,
         };
       }) || [],
   };
@@ -50,17 +57,19 @@ export default function AllExpenses({ financialState }) {
   return (
     <div className="AllTransactions">
       <h1>My Total Expenses: {expensesGeneral.typeTotal * -1}₪</h1>
-      {/* <div className="MainChart">
-        <RadialChart dataForChart={dataForChart} />
-      </div> */}
+
+      <div className="MainChart">
+        <CustomPieChart data={dataForChart.subdata} />
+      </div>
+
       <Grid container className="AllTransactions-contents" spacing={8}>
         {expensesGeneral.subtypes.map((subtype) => {
-          const subtypeTransactions = expensesTransactions.filter(
+          const transactionsOfThisSubtype = expensesTransactions.filter(
             (tx) => tx.subtypeName === subtype.name
           );
 
           const toReturn =
-            subtypeTransactions.length === 0 ? (
+            transactionsOfThisSubtype.length === 0 ? (
               <></>
             ) : (
               <Grid
@@ -69,10 +78,11 @@ export default function AllExpenses({ financialState }) {
                 theme={theme}
                 lg={12}
                 xl={4}
+                key={subtype._id}
               >
                 <TransactionsContainer
                   key={subtype._id}
-                  transactionsToDisplay={subtypeTransactions}
+                  transactionsToDisplay={transactionsOfThisSubtype}
                   globalId={financialState.generalStructure._id}
                   type={subtype}
                   // actionsWithTransactions={actions}
