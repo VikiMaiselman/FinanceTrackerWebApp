@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
 import { Grid, createTheme } from "@mui/material";
 import axios from "axios";
 
 import TransactionsContainer from "./TransactionsContainer";
-import AllExpenses from "./AllExpenses";
-import RadialChart from "./RadialChart";
+import FinancialInfoPage from "./FinancialInfoPage";
+import CustomBarChart from "./CustomBarChart";
 import "../styles/AllTransactions.css";
 
 const url = "http://localhost:3007";
@@ -39,7 +38,6 @@ export default function AllTransactions() {
       const generalStructure = finance.generalStructure;
       const allTransactions = finance.allTransactions;
 
-      console.log(finance);
       const updateFinanceState = (prevState) => {
         return {
           ...prevState,
@@ -115,20 +113,13 @@ export default function AllTransactions() {
   };
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
-  const dataForChart = {
-    total: financeState.generalStructure?.total,
-    subdata:
-      financeState.generalStructure?.types?.map((type, idx) => {
-        return {
-          name: type.name,
-          subtotal:
-            ((type.typeTotal < 0 ? type.typeTotal * -1 : type.typeTotal) *
-              100) /
-            financeState.generalStructure?.total,
-          fill: colorTypes[idx],
-        };
-      }) || [],
-  };
+  const data = financeState.generalStructure?.types?.map((type, idx) => {
+    return {
+      name: type.name,
+      subtotal: type.typeTotal < 0 ? type.typeTotal * -1 : type.typeTotal,
+      fill: colorTypes[idx],
+    };
+  });
 
   const toRender = financeState.generalStructure ? (
     <>
@@ -137,13 +128,13 @@ export default function AllTransactions() {
           My Total Financial State: {financeState.generalStructure.total}₪
         </h1>
 
-        <div className="MainChart">
-          <RadialChart dataForChart={dataForChart} />
-        </div>
+        {financeState.generalStructure.total !== 0 && (
+          <CustomBarChart data={data} />
+        )}
 
         <Grid container className="AllTransactions-contents" spacing={8}>
           {financeState.generalStructure.types.map((type) => {
-            const transactionsPerType = financeState.allTransactions.filter(
+            const transactionsOfThisType = financeState.allTransactions.filter(
               (tx) => tx.typeName === type.name
             );
             return (
@@ -157,10 +148,11 @@ export default function AllTransactions() {
               >
                 <TransactionsContainer
                   key={type._id}
-                  transactionsToDisplay={transactionsPerType}
+                  isFullVersion={true}
+                  transactionsToDisplay={transactionsOfThisType}
                   globalId={financeState.generalStructure._id}
                   type={type}
-                  actionsWithTransactions={actions}
+                  actions={actions}
                 />
               </Grid>
             );
@@ -168,7 +160,24 @@ export default function AllTransactions() {
         </Grid>
       </div>
 
-      <AllExpenses financialState={financeState} />
+      <FinancialInfoPage
+        financeState={financeState}
+        updatePage={fetchData}
+        typeName="Expenses"
+        theme={theme}
+      />
+      <FinancialInfoPage
+        financeState={financeState}
+        updatePage={fetchData}
+        typeName="Savings"
+        theme={theme}
+      />
+      <FinancialInfoPage
+        financeState={financeState}
+        updatePage={fetchData}
+        typeName="Incomes"
+        theme={theme}
+      />
     </>
   ) : (
     <></>

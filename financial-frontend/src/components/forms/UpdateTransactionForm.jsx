@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import DoneSharpIcon from "@mui/icons-material/DoneSharp";
+import "../../styles/TransactionForm.css";
 
 export default function UpdateTransactionForm({
   txData,
   metadata,
   setIsEditable,
 }) {
-  console.log("in update transaction form", txData, metadata);
   const [tx, setTx] = useState({
     _id: txData._id,
     name: txData.name,
@@ -16,7 +16,7 @@ export default function UpdateTransactionForm({
     typeName: metadata.type.name,
   });
 
-  const { updateTransaction } = metadata.actionsWithTransactions;
+  const { updateTransaction } = metadata.actions;
 
   const handleChange = (event) => {
     const { name, value } = event.target;

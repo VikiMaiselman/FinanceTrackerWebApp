@@ -1,17 +1,15 @@
 import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import UpdateTransactionForm from "./UpdateTransactionForm";
+import UpdateTransactionForm from "./forms/UpdateTransactionForm";
 import "../styles/Transaction.css";
 
-export default function Transaction({ txData, metadata }) {
+export default function Transaction({ isFullVersion, txData, metadata }) {
   const { name, sum, date, subtypeName } = txData;
-  const removeTransaction =
-    metadata?.actionsWithTransactions?.removeTransaction;
+  const removeTransaction = metadata?.actions?.removeTransaction;
 
   const [isEditable, setIsEditable] = useState(false);
 
-  const displayMore = metadata.actionsWithTransactions ? true : false;
   const whatToRender = isEditable ? (
     <UpdateTransactionForm
       txData={txData}
@@ -19,12 +17,16 @@ export default function Transaction({ txData, metadata }) {
       setIsEditable={setIsEditable}
     />
   ) : (
-    <div className={displayMore ? "Transaction" : "Transaction less-columns"}>
+    <div
+      className={
+        isFullVersion ? "Transaction" : "Transaction less-columns"
+      }
+    >
       <p className="name">{name}</p>
       <p>{sum} ₪</p>
       <p>{date}</p>
-      {displayMore && <p>({subtypeName})</p>}
-      {displayMore && (
+      {isFullVersion && <p>({subtypeName})</p>}
+      {isFullVersion && (
         <div className="Transaction-data">
           <button
             className="Transaction-handlerBtn"

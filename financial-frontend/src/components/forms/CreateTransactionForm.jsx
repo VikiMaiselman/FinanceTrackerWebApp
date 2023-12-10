@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
-import "../styles/CreateTransactionForm.css";
+import "../../styles/TransactionForm.css";
 
 export default function CreateTransactionForm({ metadata }) {
   const [tx, setTx] = useState({
@@ -11,7 +11,7 @@ export default function CreateTransactionForm({ metadata }) {
     typeName: metadata.type.name,
   });
 
-  const { addTransaction } = metadata.actionsWithTransactions;
+  const { addTransaction } = metadata.actions;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -47,29 +47,29 @@ export default function CreateTransactionForm({ metadata }) {
         name="name"
         value={tx.name}
         placeholder="Transaction..."
+        autoComplete="off"
       />
       <input
         onChange={handleChange}
         name="sum"
         value={tx.sum}
         placeholder="Sum..."
+        autoComplete="off"
       />
 
       <input
         name="subtypeName"
         id="subtype"
         value={tx.subtypeName}
-        list={metadata.type.subtypes}
+        list={`datalist-${metadata.type.name}`}
         placeholder="Select category..."
         onChange={handleChange}
         onFocus={handleFocus}
         autoComplete="off"
       />
-      <datalist id={metadata.type.subtypes}>
+      <datalist id={`datalist-${metadata.type.name}`}>
         {metadata.type.subtypes.map((subtype) => {
-          return (
-            <option key={subtype.name} id={subtype.name} value={subtype.name} />
-          );
+          return <option key={subtype._id} value={subtype.name} />;
         })}
       </datalist>
       <div>

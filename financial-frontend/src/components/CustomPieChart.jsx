@@ -1,10 +1,12 @@
 import { PieChart, Pie } from "recharts";
-import React, { PureComponent } from "react";
+import React from "react";
 
 export default function CustomPieChart({ data }) {
-  console.log("data", data);
+  const renderLabel = function (entry) {
+    return `${entry.name} (${entry.subtotal}₪)`;
+  };
   return (
-    <PieChart width={730} height={250}>
+    <PieChart width={760} height={250}>
       <Pie
         data={data}
         dataKey="subtotal"
@@ -12,9 +14,9 @@ export default function CustomPieChart({ data }) {
         cx="50%"
         cy="50%"
         innerRadius={60}
-        // outerRadius={80}
-        fill={`#${data.subdata.fill}`}
-        label
+        outerRadius={90}
+        fill={`#${data.fill}`}
+        label={renderLabel}
       />
     </PieChart>
   );

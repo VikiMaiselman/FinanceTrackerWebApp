@@ -1,0 +1,17 @@
+.ManageSubtypes {
+  margin: 0 auto 2.5% auto;
+  display: flex;
+  color: #755827;
+}
+.ManageSubtypes-h2 {
+  margin: 2.5% auto 0 auto;
+  color: #755827;
+  font-family: "Cedarville Cursive", cursive;
+}
+
+@media (max-width: 1200px) {
+  .ManageSubtypes {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
