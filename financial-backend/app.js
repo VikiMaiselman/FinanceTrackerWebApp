@@ -7,6 +7,20 @@ import cors from "cors";
 const app = express();
 const port = 3007;
 let Global, Transaction, Subtype, Type, Temp, User; // mongoose models
+const defaultSubtypes = [
+  "Food&Drinks",
+  "Entertainment",
+  "Rent/Mortgage",
+  "Bills",
+  "Transport",
+  "Beauty",
+  "Health&Sports",
+  "Miscellaneous",
+  "Gifts",
+  "Salary",
+  "General Savings",
+  "Other Incomes",
+];
 
 app.use(
   cors({
@@ -94,28 +108,28 @@ async function initializeDatabase() {
   });
 
   const savingsSubcat = new Subtype({
-    name: "Savings",
-    color: "#FEFAE0",
+    name: "General Savings",
+    color: "#EAC696",
   });
 
   const food = new Subtype({
     name: "Food&Drinks",
-    color: "#FEFAE0",
+    color: "#C8AE7D",
   });
 
   const entertainment = new Subtype({
     name: "Entertainment",
-    color: "#FEFAE0",
+    color: "#765827",
   });
 
   const housing = new Subtype({
     name: "Rent/Mortgage",
-    color: "#FEFAE0",
+    color: "#65451F",
   });
 
   const bills = new Subtype({
     name: "Bills",
-    color: "#FEFAE0",
+    color: "#6C3428",
   });
 
   const transportation = new Subtype({
@@ -125,22 +139,22 @@ async function initializeDatabase() {
 
   const beauty = new Subtype({
     name: "Beauty",
-    color: "#FEFAE0",
+    color: "#BA704F",
   });
 
   const health = new Subtype({
     name: "Health&Sports",
-    color: "#FEFAE0",
+    color: "#DFA878",
   });
 
   const miscellaneous = new Subtype({
     name: "Miscellaneous",
-    color: "#FEFAE0",
+    color: "#DFA878",
   });
 
   const gifts = new Subtype({
     name: "Gifts",
-    color: "#FEFAE0",
+    color: "#FF9B50",
   });
 
   const incomes = new Type({
@@ -192,7 +206,6 @@ app.get("/", async (req, res) => {
   try {
     generalStructure = await Global.findOne({});
     const globalId = generalStructure._id;
-    // console.log(globalId);
 
     allTransactions = await Transaction.find({ globalId: globalId });
 
@@ -211,16 +224,11 @@ app.get("/", async (req, res) => {
 
 app.post("/", async (req, res) => {
   try {
-    // const generalStructure = await Global.findOne({});
-    // const globalId = generalStructure._id;
-    // console.log(globalId);
-
     const { name, sum, globalId, subtypeName, typeName } = req.body;
     const now = new Date();
     const date = `${now
       .getDate()
       .toString()}/${now.getMonth()}/${now.getFullYear()}`;
-    console.log(date);
 
     const test = new Transaction({
       name: name,
@@ -246,20 +254,17 @@ app.post("/", async (req, res) => {
 async function updateTotals(globalId, sum, txOperation, txType) {
   try {
     const global = await Global.findOne({ _id: globalId });
-    const globalTotal = global.total;
-    let sumToAdd = sum;
+    const globalTotal = Number(global.total);
+    let sumToAdd = Number(sum);
 
     const turnToNegative =
       (txOperation === "addTx" && txType === "Expenses") ||
       (txOperation === "removeTx" && txType !== "Expenses");
 
     if (turnToNegative) sumToAdd = -1 * sumToAdd;
+    const newSum = globalTotal + sumToAdd;
 
-    const result = await Global.updateOne(
-      { _id: globalId },
-      { total: globalTotal + sumToAdd }
-    );
-    // console.log(result, globalId, global);
+    const result = await Global.updateOne({ _id: globalId }, { total: newSum });
 
     const type = await Global.updateOne(
       {
@@ -270,19 +275,44 @@ async function updateTotals(globalId, sum, txOperation, txType) {
         $inc: { "types.$.typeTotal": sumToAdd },
       }
     );
-    // console.log(type);
   } catch (error) {
     throw error;
   }
 }
 
-app.post("/deleteTransaction", async (req, res) => {
+async function updateTotalsOnTransactionUpdate(
+  globalId,
+  prevSum,
+  newSum,
+  txType
+) {
   try {
-    const { transaction, globalId } = req.body;
-    // console.log(transactionId, globalId);
+    const global = await Global.findOne({ _id: globalId });
+    const globalTotal = Number(global.total);
+    let sumToAdd = Number(newSum) - Number(prevSum);
 
-    const result = await Transaction.findByIdAndDelete(transaction._id);
-    // console.log(result);
+    if (txType === "Expenses") sumToAdd = -1 * sumToAdd;
+
+    await Global.updateOne(
+      { _id: globalId },
+      { total: globalTotal + sumToAdd }
+    );
+
+    await Global.updateOne(
+      {
+        _id: globalId,
+        "types.name": txType,
+      },
+      {
+        $inc: { "types.$.typeTotal": sumToAdd },
+      }
+    );
+  } catch (error) {}
+}
+
+async function removeTransaction(transaction, globalId) {
+  try {
+    await Transaction.findByIdAndDelete(transaction._id);
 
     await updateTotals(
       globalId,
@@ -290,6 +320,14 @@ app.post("/deleteTransaction", async (req, res) => {
       "removeTx",
       transaction.typeName
     );
+  } catch (error) {
+    throw error;
+  }
+}
+app.post("/deleteTransaction", async (req, res) => {
+  try {
+    const { transaction, globalId } = req.body;
+    await removeTransaction(transaction, globalId);
 
     return res.status(200).json("Successfully removed the transaction.");
   } catch (error) {
@@ -303,9 +341,9 @@ app.post("/deleteTransaction", async (req, res) => {
 app.post("/updateTransaction", async (req, res) => {
   const { transaction, globalId } = req.body;
 
-  // console.log(transactionId, globalId);
   try {
-    const prevTxData = await Transaction.findOne({ _id: transaction._id });
+    await Transaction.findOne({ _id: transaction._id });
+
     const result = await Transaction.findOneAndUpdate(
       { _id: transaction._id },
       {
@@ -314,8 +352,6 @@ app.post("/updateTransaction", async (req, res) => {
         subtypeName: transaction.subtypeName,
       }
     );
-
-    // console.log(prevTxData, result, transaction.sum);
 
     await updateTotalsOnTransactionUpdate(
       globalId,
@@ -333,37 +369,81 @@ app.post("/updateTransaction", async (req, res) => {
   }
 });
 
-async function updateTotalsOnTransactionUpdate(
-  globalId,
-  prevSum,
-  newSum,
-  txType
-) {
+app.post("/addSubtype", async (req, res) => {
+  const {
+    newSubtype: { name, color },
+    globalId,
+    typeName,
+  } = req.body;
+
+  const globalObj = await Global.findOne({ _id: globalId });
+  const hasThisSubtypeAlready = globalObj.types
+    .find((type) => type.name === typeName)
+    .subtypes.some((subtype) => subtype.name === name);
+
+  if (hasThisSubtypeAlready)
+    return res.status(400).json("This subcategory of expenses already exists.");
+
+  const newSubtypeObj = new Subtype({
+    name: name,
+    color: color,
+  });
+
   try {
-    const global = await Global.findOne({ _id: globalId });
-    const globalTotal = global.total;
-    let sumToAdd = Number(newSum) - Number(prevSum);
-
-    if (txType === "Expenses") sumToAdd = -1 * sumToAdd;
-
-    const result = await Global.updateOne(
+    await Global.findOneAndUpdate(
       { _id: globalId },
-      { total: globalTotal + sumToAdd }
-    );
-    // console.log("updating global.total", result, globalId, global);
-
-    const type = await Global.updateOne(
       {
-        _id: globalId,
-        "types.name": txType,
+        $push: {
+          "types.$[type].subtypes": newSubtypeObj,
+        },
       },
       {
-        $inc: { "types.$.typeTotal": sumToAdd },
+        arrayFilters: [{ "type.name": typeName }],
       }
     );
-    // console.log(type);
+
+    return res.json("Created");
   } catch (error) {}
-}
+});
+
+app.post("/removeSubtype", async (req, res) => {
+  const {
+    subtype: { name, _id },
+    globalId,
+    typeName,
+  } = req.body;
+
+  if (defaultSubtypes.includes(name))
+    return res
+      .status(400)
+      .json("Can't delete this subcategory. It is predefined.");
+
+  try {
+    // 1. Remove the subtype
+    await Global.updateOne(
+      { _id: globalId },
+      {
+        $pull: {
+          "types.$[type].subtypes": { _id: _id },
+        },
+      },
+      {
+        arrayFilters: [{ "type.name": typeName }],
+      }
+    );
+
+    // 2. Delete All transactions with this subtype name
+    const transactionsOfRemovedSubtype = await Transaction.find({
+      subtypeName: name,
+    });
+
+    transactionsOfRemovedSubtype.map(async (transaction) => {
+      await removeTransaction(transaction, globalId);
+    });
+
+    return res.json("Removed");
+  } catch (error) {}
+});
 
 app.listen(port, () => console.log(`Server's up. Listening on port ${port}`));
 
