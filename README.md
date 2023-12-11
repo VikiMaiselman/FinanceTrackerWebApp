@@ -1,4 +1,4 @@
-*** This a financial tracker application. ***
+This a financial tracker application
 
 Instructions:
 
