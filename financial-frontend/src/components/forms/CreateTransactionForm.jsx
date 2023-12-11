@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
-import "../../styles/TransactionForm.css";
+import "../../styles/Form.css";
 
 export default function CreateTransactionForm({ metadata }) {
   const [tx, setTx] = useState({

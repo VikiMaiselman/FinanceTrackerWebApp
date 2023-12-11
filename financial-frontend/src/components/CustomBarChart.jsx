@@ -1,12 +1,4 @@
-import {
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  Bar,
-} from "recharts";
+import { BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from "recharts";
 import React from "react";
 
 export default function CustomBarChart({ data }) {
@@ -20,7 +12,6 @@ export default function CustomBarChart({ data }) {
       <XAxis dataKey="name" />
       <YAxis />
       <Tooltip />
-      <Legend />
       <Bar dataKey="subtotal" fill="fill" />
     </BarChart>
   );

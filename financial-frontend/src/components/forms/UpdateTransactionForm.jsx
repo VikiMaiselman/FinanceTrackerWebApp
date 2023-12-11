@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DoneSharpIcon from "@mui/icons-material/DoneSharp";
-import "../../styles/TransactionForm.css";
+import "../../styles/Form.css";
 
 export default function UpdateTransactionForm({
   txData,

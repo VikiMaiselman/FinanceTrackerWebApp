@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Grid, createTheme } from "@mui/material";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createTheme } from "@mui/material";
 import axios from "axios";
 
-import TransactionsContainer from "./TransactionsContainer";
+import Navbar from "./Navbar";
 import FinancialInfoPage from "./FinancialInfoPage";
-import CustomBarChart from "./CustomBarChart";
+import MainPage from "./MainPage";
+import ErrorPage from "./ErrorPage";
 import "../styles/AllTransactions.css";
+import "../styles/NavigationBar.css";
 
 const url = "http://localhost:3007";
 const headers = {
@@ -25,7 +28,7 @@ const theme = createTheme({
   },
 });
 
-export default function AllTransactions() {
+export default function AllTransactions({ errorHandler }) {
   const [financeState, setFinanceState] = useState({
     allTransactions: "",
     generalStructure: "",
@@ -48,6 +51,10 @@ export default function AllTransactions() {
       setFinanceState(() => updateFinanceState());
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
   };
 
@@ -64,6 +71,10 @@ export default function AllTransactions() {
       await axios.post(url, newTransaction, { withCredentials: true }, headers);
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
 
     fetchData();
@@ -83,6 +94,10 @@ export default function AllTransactions() {
       );
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
 
     fetchData();
@@ -102,6 +117,10 @@ export default function AllTransactions() {
       );
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
     fetchData();
   };
@@ -122,64 +141,74 @@ export default function AllTransactions() {
   });
 
   const toRender = financeState.generalStructure ? (
-    <>
-      <div className="AllTransactions">
-        <h1>
-          My Total Financial State: {financeState.generalStructure.total}₪
-        </h1>
+    <div className="AllTransactions">
+      <Navbar />
 
-        {financeState.generalStructure.total !== 0 && (
-          <CustomBarChart data={data} />
-        )}
-
-        <Grid container className="AllTransactions-contents" spacing={8}>
-          {financeState.generalStructure.types.map((type) => {
-            const transactionsOfThisType = financeState.allTransactions.filter(
-              (tx) => tx.typeName === type.name
-            );
-            return (
-              <Grid
-                className="AllTransaction-content"
-                item
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MainPage
+                financeState={financeState}
+                dataForChart={data}
+                actions={actions}
                 theme={theme}
-                lg={12}
-                xl={4}
-                key={type._id}
-              >
-                <TransactionsContainer
-                  key={type._id}
-                  isFullVersion={true}
-                  transactionsToDisplay={transactionsOfThisType}
-                  globalId={financeState.generalStructure._id}
-                  type={type}
-                  actions={actions}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
-      </div>
-
-      <FinancialInfoPage
-        financeState={financeState}
-        updatePage={fetchData}
-        typeName="Expenses"
-        theme={theme}
-      />
-      <FinancialInfoPage
-        financeState={financeState}
-        updatePage={fetchData}
-        typeName="Savings"
-        theme={theme}
-      />
-      <FinancialInfoPage
-        financeState={financeState}
-        updatePage={fetchData}
-        typeName="Incomes"
-        theme={theme}
-      />
-    </>
+              />
+            }
+          />
+          <Route
+            path="expenses"
+            element={
+              <FinancialInfoPage
+                financeState={financeState}
+                updatePage={fetchData}
+                typeName="Expenses"
+                theme={theme}
+                errorHandler={errorHandler}
+              />
+            }
+          />
+          <Route
+            path="incomes"
+            element={
+              <FinancialInfoPage
+                financeState={financeState}
+                updatePage={fetchData}
+                typeName="Incomes"
+                theme={theme}
+                errorHandler={errorHandler}
+              />
+            }
+          />
+          <Route
+            path="savings"
+            element={
+              <FinancialInfoPage
+                financeState={financeState}
+                updatePage={fetchData}
+                typeName="Savings"
+                theme={theme}
+                errorHandler={errorHandler}
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <ErrorPage
+                error={{
+                  isError: true,
+                  message: "404. Such page does not exist 😢",
+                }}
+              />
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </div>
   ) : (
+    // </>
     <></>
   );
   return toRender;

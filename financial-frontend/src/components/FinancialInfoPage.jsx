@@ -19,6 +19,7 @@ export default function FinancialInfoPage({
   updatePage,
   typeName,
   theme,
+  errorHandler,
 }) {
   const typeGeneral = financeState.generalStructure.types.find(
     (type) => type.name === typeName
@@ -42,6 +43,10 @@ export default function FinancialInfoPage({
       );
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
 
     await updatePage();
@@ -63,6 +68,10 @@ export default function FinancialInfoPage({
       );
     } catch (error) {
       console.error(error);
+      errorHandler({
+        isError: true,
+        message: error.response.data,
+      });
     }
 
     await updatePage();
@@ -139,13 +148,15 @@ export default function FinancialInfoPage({
         })}
       </Grid>
 
-      <h2 className="ManageSubtypes-h2">
-        Here you can manage your subcategories for a better finance analytics
-        and planification:
-      </h2>
-      <div className="ManageSubtypes">
-        <CreateSubtypeForm type={typeGeneral} actions={actions} />
-        <RemoveSubtypeForm type={typeGeneral} actions={actions} />
+      <div>
+        <h2 className="ManageSubtypes-h2">
+          Here you can manage your subcategories for a better finance analytics
+          and planification:
+        </h2>
+        <div className="ManageSubtypes">
+          <CreateSubtypeForm type={typeGeneral} actions={actions} />
+          <RemoveSubtypeForm type={typeGeneral} actions={actions} />
+        </div>
       </div>
     </div>
   );

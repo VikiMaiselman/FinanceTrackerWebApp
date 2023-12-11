@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
+import { Fab } from "@mui/material";
 import { HexColorPicker } from "react-colorful";
 
-import "../../styles/TransactionForm.css";
+import "../../styles/Form.css";
 
 export default function CreateSubtypeForm({ type, actions }) {
   const [color, setColor] = useState("");
@@ -28,7 +29,7 @@ export default function CreateSubtypeForm({ type, actions }) {
   };
 
   return (
-    <form className="Subtype">
+    <form className="SubtypeForm">
       <h3>
         Create new {type.name[0].toLowerCase() + type.name.slice(1)}{" "}
         subcategory:{" "}
@@ -44,9 +45,9 @@ export default function CreateSubtypeForm({ type, actions }) {
       <HexColorPicker color={color} onChange={setColor} />
       <p>Current color is {color}</p>
 
-      <button onClick={handleClick}>
+      <Fab onClick={handleClick} size="small">
         <AddCircleOutlineSharpIcon sx={{ color: "#706233" }} />
-      </button>
+      </Fab>
     </form>
   );
 }

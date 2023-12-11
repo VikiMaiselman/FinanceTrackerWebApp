@@ -1,12 +1,25 @@
+import React, { useState } from "react";
 import "../styles/App.css";
-import AllTransactions from "./AllTransactions";
+import AllTransactions from "./AppRouter";
+import ErrorPage from "./ErrorPage";
 
 function App() {
-  return (
+  const [error, setError] = useState({
+    isError: false,
+    message: "",
+  });
+
+  const toRender = (
     <div className="App">
-      <AllTransactions />
+      {error.isError ? (
+        <ErrorPage error={error} />
+      ) : (
+        <AllTransactions errorHandler={setError} />
+      )}
     </div>
   );
+
+  return toRender;
 }
 
 export default App;

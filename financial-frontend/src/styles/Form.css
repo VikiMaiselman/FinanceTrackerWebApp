@@ -13,7 +13,7 @@
 }
 
 .Transaction input,
-.Subtype input {
+.SubtypeForm input {
   border: none;
   border-radius: 5px;
   width: 100px;
@@ -28,8 +28,7 @@
   }
 }
 
-.Transaction button,
-.Subtype button {
+.Transaction button {
   border: none;
   border-radius: 5px;
   background-color: inherit;
@@ -38,11 +37,17 @@
   justify-content: center;
 }
 
+.SubtypeForm button {
+  background-color: #fbf0df;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 #subtype {
   width: 150px;
 }
 
-.Subtype {
+.SubtypeForm {
   padding: 1.5% 2.5%;
   margin: 1.5%;
   width: 50%;
@@ -56,16 +61,16 @@
   justify-content: space-between;
   gap: 15px;
 }
-.Subtype h3 {
-  font-family: "Cedarville Cursive", cursive;
+.SubtypeForm h3 {
+  font-family: "Caudex", serif;
   line-height: 0.9;
   font-weight: lighter;
 }
-.Subtype input {
+.SubtypeForm input {
   width: 300px;
 }
-.Subtype p {
-  font-family: "Cedarville Cursive", cursive;
+.SubtypeForm p {
+  font-family: "Caudex", serif;
 }
 .span-underline {
   text-decoration: underline;

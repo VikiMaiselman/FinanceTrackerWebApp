@@ -5,6 +5,8 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  font-family: "Cedarville Cursive", cursive;
+  font-family: "Caudex", serif;
 }
 
 #root {

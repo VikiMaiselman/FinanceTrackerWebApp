@@ -1,0 +1,25 @@
+.Navbar {
+  list-style-type: none;
+  background-color: #5f6f52;
+
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.Navbar-component {
+  margin: 0 15px;
+  display: inline;
+  float: left;
+}
+.Navbar-component a {
+  width: 100%;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.Navbar-component a:hover {
+  background-color: #3f3f3f;
+}

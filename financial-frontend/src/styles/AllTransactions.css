@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 50px;
   width: 100%;
   /* min-height: 97vh; */
 }
@@ -11,7 +12,7 @@
   margin: 2.5% auto;
   font-weight: 900;
   letter-spacing: 3px;
-  font-family: "Cedarville Cursive", cursive;
+  font-family: "Caudex", serif;
   font-size: 3rem;
 }
 

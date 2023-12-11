@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import "../../styles/TransactionForm.css";
+import { Fab } from "@mui/material";
+import "../../styles/Form.css";
 
 export default function RemoveSubtypeForm({ type, actions }) {
   const [subtype, setSubtype] = useState({
@@ -33,7 +34,7 @@ export default function RemoveSubtypeForm({ type, actions }) {
   };
 
   return (
-    <form className="Subtype">
+    <form className="SubtypeForm">
       <h3>
         Remove any of your <span className="span-underline">custom</span>{" "}
         {type.name[0].toLowerCase() + type.name.slice(1)} subcategories:{" "}
@@ -59,9 +60,9 @@ export default function RemoveSubtypeForm({ type, actions }) {
           );
         })}
       </datalist>
-      <button onClick={handleClick}>
+      <Fab onClick={handleClick} size="small">
         <DeleteIcon sx={{ color: "#706233" }} />
-      </button>
+      </Fab>
     </form>
   );
 }
