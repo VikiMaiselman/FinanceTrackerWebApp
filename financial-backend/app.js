@@ -1,4 +1,3 @@
-// import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
@@ -6,7 +5,7 @@ import cors from "cors";
 
 const app = express();
 const port = 3007;
-let Global, Transaction, Subtype, Type, Temp, User; // mongoose models
+let Global, Transaction, Subtype, Type, User; // mongoose models
 const defaultSubtypes = [
   "Food&Drinks",
   "Entertainment",
@@ -39,10 +38,10 @@ app.use("*", function (req, res, next) {
 // enable pre-flight
 app.options("*", cors());
 
-app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/* ************ C O N F I G U R E   D A T A B A S E ************ */
 async function initializeDatabase() {
   try {
     await mongoose.connect("mongodb://localhost:27017/FinanceTrackerVer2");
@@ -51,6 +50,7 @@ async function initializeDatabase() {
     // handle error appropriately
   }
 
+  /* create mongodb schemas */
   const SubtypeSchema = new mongoose.Schema({
     name: {
       type: String,
@@ -94,10 +94,12 @@ async function initializeDatabase() {
     typeName: String,
   });
 
+  /* create mongodb models */
   Transaction = mongoose.model("Transaction", TransactionSchema);
   Subtype = mongoose.model("Subtype", SubtypeSchema);
   Type = mongoose.model("Type", TypeSchema);
 
+  /* populate mongodb models with pre-defined values - 3 types "expenses", "incomes", "savings" & their subtypes */
   const salaryIncome = new Subtype({
     name: "Salary",
     color: "#5F6F52",
@@ -218,27 +220,27 @@ app.get("/", async (req, res) => {
     console.error(error);
     return res
       .status(400)
-      .json("Something went wrong. Page unavailable. Try again later.");
+      .json("Page unavailable. Try again later or contact the support.");
   }
 });
 
 app.post("/", async (req, res) => {
+  const { name, sum, globalId, subtypeName, typeName } = req.body;
+  const now = new Date();
+  const date = `${now
+    .getDate()
+    .toString()}/${now.getMonth()}/${now.getFullYear()}`;
+
+  const test = new Transaction({
+    name: name,
+    sum: Number(sum),
+    date: date,
+    globalId: globalId,
+    subtypeName: subtypeName,
+    typeName: typeName,
+  });
+
   try {
-    const { name, sum, globalId, subtypeName, typeName } = req.body;
-    const now = new Date();
-    const date = `${now
-      .getDate()
-      .toString()}/${now.getMonth()}/${now.getFullYear()}`;
-
-    const test = new Transaction({
-      name: name,
-      sum: Number(sum),
-      date: date,
-      globalId: globalId,
-      subtypeName: subtypeName,
-      typeName: typeName,
-    });
-
     await test.save();
     await updateTotals(globalId, Number(sum), "addTx", typeName);
 
@@ -247,9 +249,170 @@ app.post("/", async (req, res) => {
     console.error(error);
     return res
       .status(400)
-      .json("Something went wrong. Action unavailable. Try again later.");
+      .json(
+        "Could not create a transaction. Action unavailable. Refresh and try again later."
+      );
   }
 });
+
+app.post("/deleteTransaction", async (req, res) => {
+  try {
+    const { transaction, globalId } = req.body;
+    await removeTransaction(transaction, globalId);
+    return res.status(200).json("Successfully removed the transaction.");
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(400)
+      .json(
+        "Could not remove the transaction. Action unavailable. Refresh and try again later."
+      );
+  }
+});
+
+app.post("/updateTransaction", async (req, res) => {
+  const { transaction, globalId } = req.body;
+
+  try {
+    const result = await Transaction.findOneAndUpdate(
+      { _id: transaction._id },
+      {
+        name: transaction.name,
+        sum: Number(transaction.sum),
+        subtypeName: transaction.subtypeName,
+      }
+    );
+
+    await updateTotalsOnTransactionUpdate(
+      globalId,
+      result.sum,
+      transaction.sum,
+      result.typeName
+    );
+
+    return res.status(200).json("Successfully updated the transaction.");
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(400)
+      .json(
+        "Could not update your transaction. Action unavailable. Refresh and try again later."
+      );
+  }
+});
+
+app.post("/addSubtype", async (req, res) => {
+  const {
+    newSubtype: { name, color },
+    globalId,
+    typeName,
+  } = req.body;
+
+  if (!name || !color)
+    return res
+      .status(400)
+      .json("Please, enter all the required fields to create a subcategory.");
+
+  const globalObj = await Global.findOne({ _id: globalId });
+  const hasThisSubtypeAlready = globalObj.types
+    .find((type) => type.name === typeName)
+    .subtypes.some((subtype) => subtype.name === name);
+
+  if (hasThisSubtypeAlready)
+    return res.status(400).json("This subcategory of expenses already exists.");
+
+  const newSubtypeObj = new Subtype({
+    name: name,
+    color: color,
+  });
+
+  try {
+    await Global.findOneAndUpdate(
+      { _id: globalId },
+      {
+        $push: {
+          "types.$[type].subtypes": newSubtypeObj,
+        },
+      },
+      {
+        arrayFilters: [{ "type.name": typeName }],
+      }
+    );
+
+    return res.json("Created");
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(400)
+      .json(
+        "Could not create the subcategory. Try again later or contact the support."
+      );
+  }
+});
+
+app.post("/removeSubtype", async (req, res) => {
+  const {
+    subtype: { name, _id },
+    globalId,
+    typeName,
+  } = req.body;
+
+  if (defaultSubtypes.includes(name))
+    return res
+      .status(400)
+      .json(
+        "Could not delete this subcategory. It is predefined and is not to be removed."
+      );
+
+  try {
+    // 1. Remove the subtype
+    await Global.updateOne(
+      { _id: globalId },
+      {
+        $pull: {
+          "types.$[type].subtypes": { _id: _id },
+        },
+      },
+      {
+        arrayFilters: [{ "type.name": typeName }],
+      }
+    );
+
+    // 2. Delete All transactions with this subtype name
+    const transactionsOfRemovedSubtype = await Transaction.find({
+      subtypeName: name,
+    });
+
+    transactionsOfRemovedSubtype.map(async (transaction) => {
+      await removeTransaction(transaction, globalId);
+    });
+
+    return res.json("Removed");
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(400)
+      .json(
+        "Could not remove the subcategory. Try again later or contact the support."
+      );
+  }
+});
+
+app.listen(port, () => console.log(`Server's up. Listening on port ${port}`));
+
+process.on("SIGINT", async () => {
+  try {
+    await mongoose.connection.close();
+    console.log(
+      "Mongoose connection is disconnected due to application termination"
+    );
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+/* ************ H E L P E R   F U N C T I O N S ************ */
 
 async function updateTotals(globalId, sum, txOperation, txType) {
   try {
@@ -264,9 +427,8 @@ async function updateTotals(globalId, sum, txOperation, txType) {
     if (turnToNegative) sumToAdd = -1 * sumToAdd;
     const newSum = globalTotal + sumToAdd;
 
-    const result = await Global.updateOne({ _id: globalId }, { total: newSum });
-
-    const type = await Global.updateOne(
+    await Global.updateOne({ _id: globalId }, { total: newSum });
+    await Global.updateOne(
       {
         _id: globalId,
         "types.name": txType,
@@ -307,13 +469,14 @@ async function updateTotalsOnTransactionUpdate(
         $inc: { "types.$.typeTotal": sumToAdd },
       }
     );
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
 }
 
 async function removeTransaction(transaction, globalId) {
   try {
     await Transaction.findByIdAndDelete(transaction._id);
-
     await updateTotals(
       globalId,
       transaction.sum,
@@ -324,137 +487,3 @@ async function removeTransaction(transaction, globalId) {
     throw error;
   }
 }
-app.post("/deleteTransaction", async (req, res) => {
-  try {
-    const { transaction, globalId } = req.body;
-    await removeTransaction(transaction, globalId);
-
-    return res.status(200).json("Successfully removed the transaction.");
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(400)
-      .json("The transaction wasn't performed. Refresh and try again.");
-  }
-});
-
-app.post("/updateTransaction", async (req, res) => {
-  const { transaction, globalId } = req.body;
-
-  try {
-    await Transaction.findOne({ _id: transaction._id });
-
-    const result = await Transaction.findOneAndUpdate(
-      { _id: transaction._id },
-      {
-        name: transaction.name,
-        sum: Number(transaction.sum),
-        subtypeName: transaction.subtypeName,
-      }
-    );
-
-    await updateTotalsOnTransactionUpdate(
-      globalId,
-      result.sum,
-      transaction.sum,
-      result.typeName
-    );
-
-    return res.status(200).json("Successfully updated the transaction.");
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(400)
-      .json("The transaction wasn't performed. Refresh and try again.");
-  }
-});
-
-app.post("/addSubtype", async (req, res) => {
-  const {
-    newSubtype: { name, color },
-    globalId,
-    typeName,
-  } = req.body;
-
-  const globalObj = await Global.findOne({ _id: globalId });
-  const hasThisSubtypeAlready = globalObj.types
-    .find((type) => type.name === typeName)
-    .subtypes.some((subtype) => subtype.name === name);
-
-  if (hasThisSubtypeAlready)
-    return res.status(400).json("This subcategory of expenses already exists.");
-
-  const newSubtypeObj = new Subtype({
-    name: name,
-    color: color,
-  });
-
-  try {
-    await Global.findOneAndUpdate(
-      { _id: globalId },
-      {
-        $push: {
-          "types.$[type].subtypes": newSubtypeObj,
-        },
-      },
-      {
-        arrayFilters: [{ "type.name": typeName }],
-      }
-    );
-
-    return res.json("Created");
-  } catch (error) {}
-});
-
-app.post("/removeSubtype", async (req, res) => {
-  const {
-    subtype: { name, _id },
-    globalId,
-    typeName,
-  } = req.body;
-
-  if (defaultSubtypes.includes(name))
-    return res
-      .status(400)
-      .json("Can't delete this subcategory. It is predefined.");
-
-  try {
-    // 1. Remove the subtype
-    await Global.updateOne(
-      { _id: globalId },
-      {
-        $pull: {
-          "types.$[type].subtypes": { _id: _id },
-        },
-      },
-      {
-        arrayFilters: [{ "type.name": typeName }],
-      }
-    );
-
-    // 2. Delete All transactions with this subtype name
-    const transactionsOfRemovedSubtype = await Transaction.find({
-      subtypeName: name,
-    });
-
-    transactionsOfRemovedSubtype.map(async (transaction) => {
-      await removeTransaction(transaction, globalId);
-    });
-
-    return res.json("Removed");
-  } catch (error) {}
-});
-
-app.listen(port, () => console.log(`Server's up. Listening on port ${port}`));
-
-process.on("SIGINT", async () => {
-  try {
-    await mongoose.connection.close();
-    console.log(
-      "Mongoose connection is disconnected due to application termination"
-    );
-    process.exit(0);
-  } catch (error) {
-    console.error(error);
-  }
-});
