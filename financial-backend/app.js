@@ -136,7 +136,7 @@ async function initializeDatabase() {
 
   const transportation = new Subtype({
     name: "Transport",
-    color: "#FEFAE0",
+    color: "#186F65",
   });
 
   const beauty = new Subtype({
@@ -311,7 +311,7 @@ app.post("/addSubtype", async (req, res) => {
   if (!name || !color)
     return res
       .status(400)
-      .json("Please, enter all the required fields to create a subcategory.");
+      .json("Please, enter all the required fields to create a category.");
 
   const globalObj = await Global.findOne({ _id: globalId });
   const hasThisSubtypeAlready = globalObj.types
@@ -319,7 +319,7 @@ app.post("/addSubtype", async (req, res) => {
     .subtypes.some((subtype) => subtype.name === name);
 
   if (hasThisSubtypeAlready)
-    return res.status(400).json("This subcategory of expenses already exists.");
+    return res.status(400).json("This category of expenses already exists.");
 
   const newSubtypeObj = new Subtype({
     name: name,
@@ -345,12 +345,17 @@ app.post("/addSubtype", async (req, res) => {
     return res
       .status(400)
       .json(
-        "Could not create the subcategory. Try again later or contact the support."
+        "Could not create the category. Try again later or contact the support."
       );
   }
 });
 
 app.post("/removeSubtype", async (req, res) => {
+  if (!req.body.subtype)
+    return res
+      .status(400)
+      .json("Please, enter all the required fields to remove the category.");
+
   const {
     subtype: { name, _id },
     globalId,
@@ -361,7 +366,7 @@ app.post("/removeSubtype", async (req, res) => {
     return res
       .status(400)
       .json(
-        "Could not delete this subcategory. It is predefined and is not to be removed."
+        "Could not delete this category. It is predefined and cannot be removed."
       );
 
   try {
@@ -393,7 +398,7 @@ app.post("/removeSubtype", async (req, res) => {
     return res
       .status(400)
       .json(
-        "Could not remove the subcategory. Try again later or contact the support."
+        "Could not remove the category. Try again later or contact the support."
       );
   }
 });
