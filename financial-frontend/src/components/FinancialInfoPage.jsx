@@ -1,88 +1,18 @@
 import React from "react";
 import { Grid } from "@mui/material";
-import axios from "axios";
 
-import CreateSubtypeForm from "./forms/CreateSubtypeForm";
-import RemoveSubtypeForm from "./forms/RemoveSubtypeForm";
 import TransactionsContainer from "./TransactionsContainer";
 import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
 
-const url = "http://localhost:3007";
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "http://localhost:3000",
-};
-
-export default function FinancialInfoPage({
-  financeState,
-  updatePage,
-  typeName,
-  theme,
-  errorHandler,
-}) {
-  const typeGeneral = financeState.generalStructure.types.find(
+export default function FinancialInfoPage({ financeState, typeName, theme }) {
+  const type = financeState.generalStructure.types.find(
     (type) => type.name === typeName
   );
   const typeTransactions = financeState.allTransactions.filter(
     (tx) => tx.typeName === typeName
   );
-
-  const addSubtype = async (newSubtype) => {
-    const dataForBackend = {
-      newSubtype: newSubtype,
-      globalId: financeState.generalStructure._id,
-      typeName: typeName,
-    };
-    try {
-      await axios.post(
-        `${url}/addSubtype`,
-        dataForBackend,
-        { withCredentials: true },
-        headers
-      );
-    } catch (error) {
-      console.error(error);
-      errorHandler({
-        isError: true,
-        message: error.response.data,
-      });
-    }
-
-    await updatePage();
-  };
-
-  const removeSubtype = async (subtype) => {
-    const dataForBackend = {
-      subtype: subtype,
-      globalId: financeState.generalStructure._id,
-      typeName: typeName,
-    };
-
-    try {
-      await axios.post(
-        `${url}/removeSubtype`,
-        dataForBackend,
-        { withCredentials: true },
-        headers
-      );
-    } catch (error) {
-      console.error(error);
-      errorHandler({
-        isError: true,
-        message: error.response.data,
-      });
-    }
-
-    await updatePage();
-  };
-
-  const actions = {
-    addSubtype: addSubtype,
-    removeSubtype: removeSubtype,
-  };
-
-  const dataForChart = typeGeneral.subtypes
+  const dataForChart = type.subtypes
     .map((subtype) => {
       const associatedTransactions = typeTransactions.filter(
         (tx) => tx.subtypeName === subtype.name
@@ -93,6 +23,7 @@ export default function FinancialInfoPage({
 
       if (sumForSubtype === 0) return {};
 
+      console.log(subtype);
       return {
         key: subtype._id,
         name: subtype.name,
@@ -108,16 +39,13 @@ export default function FinancialInfoPage({
     <div className="AllTransactions">
       <h1>
         My Total {typeName}:{" "}
-        {typeName === "Expenses"
-          ? typeGeneral.typeTotal * -1
-          : typeGeneral.typeTotal}
-        ₪
+        {typeName === "Expenses" ? type.typeTotal * -1 : type.typeTotal}₪
       </h1>
 
-      {typeGeneral.typeTotal !== 0 && <CustomPieChart data={dataForChart} />}
+      {type.typeTotal !== 0 && <CustomPieChart data={dataForChart} />}
 
       <Grid container className="AllTransactions-contents" spacing={8}>
-        {typeGeneral.subtypes.map((subtype) => {
+        {type.subtypes.map((subtype) => {
           const transactionsOfThisSubtype = typeTransactions.filter(
             (tx) => tx.subtypeName === subtype.name
           );
@@ -140,24 +68,12 @@ export default function FinancialInfoPage({
                   transactionsToDisplay={transactionsOfThisSubtype}
                   globalId={financeState.generalStructure._id}
                   type={subtype}
-                  actions={actions}
                 />
               </Grid>
             );
           return toReturn;
         })}
       </Grid>
-
-      <div>
-        <h2 className="ManageSubtypes-h2">
-          Here you can manage your subcategories for a better finance analytics
-          and planification:
-        </h2>
-        <div className="ManageSubtypes">
-          <CreateSubtypeForm type={typeGeneral} actions={actions} />
-          <RemoveSubtypeForm type={typeGeneral} actions={actions} />
-        </div>
-      </div>
     </div>
   );
 }

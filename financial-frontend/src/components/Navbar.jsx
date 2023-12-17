@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function Navbar() {
+  const [isFixed, setIsFixed] = useState(false);
+
+  const defineIfFixed = () => {
+    if (window.scrollY >= 50) setIsFixed(true);
+    if (window.scrollY < 50) setIsFixed(false);
+  };
+  window.addEventListener("scroll", defineIfFixed);
+
   return (
-    <ul className="Navbar">
+    <ul className={isFixed ? "Navbar scroll" : "Navbar"}>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/"> Main</a>
+        <a href="http://localhost:3000/"> All Finance</a>
       </li>
       <li className="Navbar-component">
         <a href="http://localhost:3000/savings"> Savings</a>

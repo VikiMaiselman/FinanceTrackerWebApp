@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { createTheme } from "@mui/material";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 import Navbar from "./Navbar";
 import FinancialInfoPage from "./FinancialInfoPage";
@@ -28,10 +29,15 @@ const theme = createTheme({
   },
 });
 
-export default function AllTransactions({ errorHandler }) {
+export default function AppRouter() {
   const [financeState, setFinanceState] = useState({
     allTransactions: "",
     generalStructure: "",
+  });
+
+  const [error, errorHandler] = useState({
+    isError: false,
+    message: "",
   });
 
   const getFinanceState = async () => {
@@ -71,9 +77,10 @@ export default function AllTransactions({ errorHandler }) {
       await axios.post(url, newTransaction, { withCredentials: true }, headers);
     } catch (error) {
       console.error(error);
-      errorHandler({
-        isError: true,
-        message: error.response.data,
+      Swal.fire({
+        title: "Ooops!",
+        text: error.response.data,
+        icon: "error",
       });
     }
 
@@ -94,9 +101,10 @@ export default function AllTransactions({ errorHandler }) {
       );
     } catch (error) {
       console.error(error);
-      errorHandler({
-        isError: true,
-        message: error.response.data,
+      Swal.fire({
+        title: "Ooops!",
+        text: error.response.data,
+        icon: "error",
       });
     }
 
@@ -117,9 +125,10 @@ export default function AllTransactions({ errorHandler }) {
       );
     } catch (error) {
       console.error(error);
-      errorHandler({
-        isError: true,
-        message: error.response.data,
+      Swal.fire({
+        title: "Ooops!",
+        text: error.response.data,
+        icon: "error",
       });
     }
     fetchData();
@@ -151,6 +160,7 @@ export default function AllTransactions({ errorHandler }) {
             element={
               <MainPage
                 financeState={financeState}
+                updatePage={fetchData}
                 dataForChart={data}
                 actions={actions}
                 theme={theme}
@@ -162,10 +172,8 @@ export default function AllTransactions({ errorHandler }) {
             element={
               <FinancialInfoPage
                 financeState={financeState}
-                updatePage={fetchData}
                 typeName="Expenses"
                 theme={theme}
-                errorHandler={errorHandler}
               />
             }
           />
@@ -174,10 +182,8 @@ export default function AllTransactions({ errorHandler }) {
             element={
               <FinancialInfoPage
                 financeState={financeState}
-                updatePage={fetchData}
                 typeName="Incomes"
                 theme={theme}
-                errorHandler={errorHandler}
               />
             }
           />
@@ -186,10 +192,8 @@ export default function AllTransactions({ errorHandler }) {
             element={
               <FinancialInfoPage
                 financeState={financeState}
-                updatePage={fetchData}
                 typeName="Savings"
                 theme={theme}
-                errorHandler={errorHandler}
               />
             }
           />
@@ -208,8 +212,10 @@ export default function AllTransactions({ errorHandler }) {
       </BrowserRouter>
     </div>
   ) : (
-    // </>
-    <></>
+    <div className="AllTransactions">
+      <Navbar />
+      {error.isError ? <ErrorPage error={error} /> : null}
+    </div>
   );
   return toRender;
 }
