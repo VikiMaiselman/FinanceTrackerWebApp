@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Grid } from "@mui/material";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -23,11 +23,20 @@ export default function MainPage({
   updatePage,
 }) {
   const addSubtype = async (newSubtype) => {
+    if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
+      Swal.fire({
+        title: "Ooops!",
+        text: "Fill in all the fields, please.",
+        icon: "error",
+      });
+      return;
+    }
     const dataForBackend = {
       newSubtype: newSubtype,
       globalId: financeState.generalStructure._id,
       typeName: newSubtype.typeName,
     };
+
     try {
       await axios.post(
         `${url}/addSubtype`,
@@ -55,7 +64,15 @@ export default function MainPage({
   };
 
   const removeSubtype = async (subtype, typeName) => {
-    console.log(subtype);
+    if (!subtype || !typeName) {
+      Swal.fire({
+        title: "Ooops!",
+        text: "Fill in all the fields, please.",
+        icon: "error",
+      });
+      return;
+    }
+
     const dataForBackend = {
       subtype: subtype,
       globalId: financeState.generalStructure._id,

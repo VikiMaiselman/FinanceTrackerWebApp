@@ -23,6 +23,9 @@ export default function Navbar() {
       <li className="Navbar-component">
         <a href="http://localhost:3000/expenses"> Expenses</a>
       </li>
+      <li className="Navbar-component">
+        <a href="http://localhost:3000/logout"> Logout</a>
+      </li>
     </ul>
   );
 }

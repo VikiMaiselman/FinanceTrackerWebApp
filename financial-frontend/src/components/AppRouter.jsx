@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useStateWithCallbackLazy } from "use-state-with-callback";
 import { createTheme } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -7,6 +8,8 @@ import Swal from "sweetalert2";
 import Navbar from "./Navbar";
 import FinancialInfoPage from "./FinancialInfoPage";
 import MainPage from "./MainPage";
+import Logout from "./Logout";
+import Login from "./forms/Login";
 import ErrorPage from "./ErrorPage";
 import "../styles/AllTransactions.css";
 import "../styles/NavigationBar.css";
@@ -30,6 +33,8 @@ const theme = createTheme({
 });
 
 export default function AppRouter() {
+  const [isAuthenticated, setIsAuthenticated] = useStateWithCallbackLazy(false);
+
   const [financeState, setFinanceState] = useState({
     allTransactions: "",
     generalStructure: "",
@@ -69,8 +74,23 @@ export default function AppRouter() {
   }
 
   useEffect(() => {
+    const getAuthStatus = async () => {
+      try {
+        const response = await axios.get(
+          `${url}/authstatus`,
+          { withCredentials: true },
+          headers
+        );
+        console.log("called backend to know if authenticated", response.data);
+        setIsAuthenticated(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getAuthStatus();
+
     fetchData();
-  }, []);
+  }, [isAuthenticated]);
 
   const addTransaction = async (newTransaction) => {
     try {
@@ -149,68 +169,79 @@ export default function AppRouter() {
     };
   });
 
-  const toRender = financeState.generalStructure ? (
-    <div className="AllTransactions">
-      <Navbar />
+  console.log("is auth? ", isAuthenticated);
 
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <MainPage
-                financeState={financeState}
-                updatePage={fetchData}
-                dataForChart={data}
-                actions={actions}
-                theme={theme}
-              />
-            }
-          />
-          <Route
-            path="expenses"
-            element={
-              <FinancialInfoPage
-                financeState={financeState}
-                typeName="Expenses"
-                theme={theme}
-              />
-            }
-          />
-          <Route
-            path="incomes"
-            element={
-              <FinancialInfoPage
-                financeState={financeState}
-                typeName="Incomes"
-                theme={theme}
-              />
-            }
-          />
-          <Route
-            path="savings"
-            element={
-              <FinancialInfoPage
-                financeState={financeState}
-                typeName="Savings"
-                theme={theme}
-              />
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <ErrorPage
-                error={{
-                  isError: true,
-                  message: "404. Such page does not exist 😢",
-                }}
-              />
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </div>
+  const toRender = financeState.generalStructure ? (
+    isAuthenticated ? (
+      <div className="AllTransactions">
+        <Navbar />
+
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              index
+              element={
+                <MainPage
+                  financeState={financeState}
+                  updatePage={fetchData}
+                  dataForChart={data}
+                  actions={actions}
+                  theme={theme}
+                />
+              }
+            />
+            <Route
+              path="expenses"
+              element={
+                <FinancialInfoPage
+                  financeState={financeState}
+                  typeName="Expenses"
+                  theme={theme}
+                />
+              }
+            />
+            <Route
+              path="incomes"
+              element={
+                <FinancialInfoPage
+                  financeState={financeState}
+                  typeName="Incomes"
+                  theme={theme}
+                />
+              }
+            />
+            <Route
+              path="savings"
+              element={
+                <FinancialInfoPage
+                  financeState={financeState}
+                  typeName="Savings"
+                  theme={theme}
+                />
+              }
+            />
+            <Route
+              path="logout"
+              element={<Logout changeAuthStatus={setIsAuthenticated} />}
+            />
+            <Route
+              path="*"
+              element={
+                <ErrorPage
+                  error={{
+                    isError: true,
+                    message: "404. Such page does not exist 😢",
+                  }}
+                />
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    ) : (
+      <Login changeAuthStatus={setIsAuthenticated} />
+    )
   ) : (
     <div className="AllTransactions">
       <Navbar />
