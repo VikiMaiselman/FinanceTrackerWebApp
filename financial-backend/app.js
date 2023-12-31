@@ -1,7 +1,12 @@
+import "dotenv/config";
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
+
+import session from "express-session";
+import passport from "passport";
+import passportLocalMongoose from "passport-local-mongoose";
 
 const app = express();
 const port = 3007;
@@ -21,6 +26,7 @@ const defaultSubtypes = [
   "Other Incomes",
 ];
 
+// cors
 app.use(
   cors({
     origin: "http://localhost:3000", // allow to server to accept request from different origin
@@ -40,6 +46,18 @@ app.options("*", cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// configure session and initialize passport to manage the session
+app.use(
+  session({
+    secret: process.env.PASSPORT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 /* ************ C O N F I G U R E   D A T A B A S E ************ */
 async function initializeDatabase() {
@@ -71,13 +89,16 @@ async function initializeDatabase() {
     typeTotal: Number,
   });
 
+  const UserSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+  });
+
   const GlobalSchema = new mongoose.Schema({
-    name: String,
+    user: UserSchema,
     total: Number,
     types: [TypeSchema],
   });
-
-  Global = mongoose.model("Global", GlobalSchema);
 
   const TransactionSchema = new mongoose.Schema({
     name: {
@@ -95,10 +116,20 @@ async function initializeDatabase() {
   });
 
   /* create mongodb models */
+  Global = mongoose.model("Global", GlobalSchema);
   Transaction = mongoose.model("Transaction", TransactionSchema);
   Subtype = mongoose.model("Subtype", SubtypeSchema);
   Type = mongoose.model("Type", TypeSchema);
 
+  UserSchema.plugin(passportLocalMongoose);
+  User = mongoose.model("User", UserSchema);
+  passport.use(User.createStrategy()); // creates local login strategy
+  passport.serializeUser(User.serializeUser()); // creates session cookie
+  passport.deserializeUser(User.deserializeUser()); // cracks session cookie to obtain info
+}
+initializeDatabase();
+
+function populateModels() {
   /* populate mongodb models with pre-defined values - 3 types "expenses", "incomes", "savings" & their subtypes */
   const salaryIncome = new Subtype({
     name: "Salary",
@@ -187,28 +218,82 @@ async function initializeDatabase() {
     typeTotal: 0,
   });
 
-  const dbCondition = await Global.find();
-
-  if (dbCondition.length === 0) {
-    const global = new Global({
-      //   username: "viki",
-      //   password: "viki",
-      name: "Viki",
-      total: 0,
-      types: [incomes, expenses, savings],
-    });
-    await global.save();
-  }
+  return [savings, expenses, incomes];
 }
-initializeDatabase();
+
+app.post("/register", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  // a method provided by the package, abstracts away our interaction with DB
+  User.register({ username: username }, password, async function (err, user) {
+    if (err) {
+      console.error(err);
+      res.status(401).send(err);
+      return;
+    }
+
+    // if the user was successfully authenticated
+    passport.authenticate("local")(req, res, async function () {
+      res.send(true);
+    });
+  });
+});
+
+app.post("/login", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  const user = new User({
+    username: username,
+    password: password,
+  });
+
+  req.login(user, function (err) {
+    if (err) {
+      console.error(err);
+      res.status(401).send(err);
+      // res.send(err);
+      return;
+    }
+
+    passport.authenticate("local")(req, res, function () {
+      res.send(true);
+    });
+  });
+});
+
+app.get("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.send(false);
+  });
+});
+
+app.get("/authstatus", async (req, res) => {
+  res.send(req.isAuthenticated());
+});
 
 /* ************ R O U T E R   F U N C T I O N S ************ */
 app.get("/", async (req, res) => {
-  let generalStructure, allTransactions;
   try {
-    generalStructure = await Global.findOne({});
-    const globalId = generalStructure._id;
+    let generalStructure, allTransactions;
+    generalStructure = await Global.findOne({ user: req.user });
 
+    if (!generalStructure) {
+      const [savings, expenses, incomes] = populateModels();
+      const global = new Global({
+        user: req.user,
+        total: 0,
+        types: [incomes, expenses, savings],
+      });
+      await global.save();
+      generalStructure = await Global.findOne({ user: req.user });
+    }
+
+    const globalId = generalStructure._id;
     allTransactions = await Transaction.find({ globalId: globalId });
 
     const dataToReturn = {
