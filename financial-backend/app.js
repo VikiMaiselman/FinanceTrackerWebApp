@@ -10,7 +10,7 @@ import passportLocalMongoose from "passport-local-mongoose";
 
 const app = express();
 const port = 3007;
-let Global, Transaction, Subtype, Type, User; // mongoose models
+let Global, Transaction, Subtype, Type, Wish, User; // mongoose models
 const defaultSubtypes = [
   "Food&Drinks",
   "Entertainment",
@@ -115,11 +115,23 @@ async function initializeDatabase() {
     typeName: String,
   });
 
+  const WishSchema = new mongoose.Schema({
+    globalId: { type: mongoose.Schema.Types.ObjectId, ref: "Global" },
+    name: String,
+    description: String,
+    imageURL: String,
+    created: Date,
+    dueDate: Date,
+    neededSum: Number,
+    currentSum: Number,
+  });
+
   /* create mongodb models */
   Global = mongoose.model("Global", GlobalSchema);
   Transaction = mongoose.model("Transaction", TransactionSchema);
   Subtype = mongoose.model("Subtype", SubtypeSchema);
   Type = mongoose.model("Type", TypeSchema);
+  Wish = mongoose.model("Wish", WishSchema);
 
   UserSchema.plugin(passportLocalMongoose);
   User = mongoose.model("User", UserSchema);
@@ -393,6 +405,56 @@ app.post("/removeSubtype", async (req, res) => {
       .json(
         "Could not remove the category. Try again later or contact the support."
       );
+  }
+});
+
+app.get("/wishes", async (req, res) => {
+  try {
+    const globalId = await Global.findOne({ user: req.user });
+    const result = await Wish.find({ globalId: globalId });
+    return res.json(result);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not display the wishes.");
+  }
+});
+
+app.post("/wishes", async (req, res) => {
+  const { wish, globalId } = req.body;
+
+  try {
+    const newWish = new Wish({
+      globalId: globalId,
+      name: wish.wishName,
+      description: wish.wishDescription,
+      imageURL: wish.imageURL,
+      created: new Date().toISOString(),
+      dueDate: wish.dueDate,
+      neededSum: wish.neededAmount,
+      currentSum: 0,
+    });
+    await newWish.save();
+    return res.json("Wish added");
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not add the wish.");
+  }
+});
+
+app.patch("/wishes", async (req, res) => {
+  try {
+    const wishInQuestion = await Wish.findOne({ _id: req.body.wishId });
+
+    if (wishInQuestion) {
+      wishInQuestion.currentSum =
+        wishInQuestion.currentSum + Number(req.body.currentSum);
+      await wishInQuestion.save();
+    }
+
+    return res.json("Sum updated");
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not update the sum.");
   }
 });
 
