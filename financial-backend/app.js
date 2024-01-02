@@ -55,7 +55,6 @@ app.use(
     saveUninitialized: false,
   })
 );
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -110,6 +109,7 @@ async function initializeDatabase() {
       required: true,
     },
     date: String,
+    dateForDB: Date,
     globalId: { type: mongoose.Schema.Types.ObjectId, ref: "Global" },
     subtypeName: String,
     typeName: String,
@@ -129,98 +129,7 @@ async function initializeDatabase() {
 }
 initializeDatabase();
 
-function populateModels() {
-  /* populate mongodb models with pre-defined values - 3 types "expenses", "incomes", "savings" & their subtypes */
-  const salaryIncome = new Subtype({
-    name: "Salary",
-    color: "#5F6F52",
-  });
-  const otherIncome = new Subtype({
-    name: "Other Incomes",
-    color: "#A9B388",
-  });
-
-  const savingsSubcat = new Subtype({
-    name: "General Savings",
-    color: "#EAC696",
-  });
-
-  const food = new Subtype({
-    name: "Food&Drinks",
-    color: "#C8AE7D",
-  });
-
-  const entertainment = new Subtype({
-    name: "Entertainment",
-    color: "#765827",
-  });
-
-  const housing = new Subtype({
-    name: "Rent/Mortgage",
-    color: "#65451F",
-  });
-
-  const bills = new Subtype({
-    name: "Bills",
-    color: "#6C3428",
-  });
-
-  const transportation = new Subtype({
-    name: "Transport",
-    color: "#186F65",
-  });
-
-  const beauty = new Subtype({
-    name: "Beauty",
-    color: "#BA704F",
-  });
-
-  const health = new Subtype({
-    name: "Health&Sports",
-    color: "#DFA878",
-  });
-
-  const miscellaneous = new Subtype({
-    name: "Miscellaneous",
-    color: "#DFA878",
-  });
-
-  const gifts = new Subtype({
-    name: "Gifts",
-    color: "#FF9B50",
-  });
-
-  const incomes = new Type({
-    name: "Incomes",
-    subtypes: [salaryIncome, otherIncome],
-    typeTotal: 0,
-  });
-
-  const expenses = new Type({
-    name: "Expenses",
-    subtypes: [
-      food,
-      entertainment,
-      housing,
-      bills,
-      transportation,
-      beauty,
-      health,
-      miscellaneous,
-      gifts,
-    ],
-    typeTotal: 0,
-  });
-
-  const savings = new Type({
-    name: "Savings",
-    subtypes: [savingsSubcat],
-    typeTotal: 0,
-  });
-
-  return [savings, expenses, incomes];
-}
-
+/* ************ R O U T E R   F U N C T I O N S ************ */
 app.post("/register", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -253,7 +162,6 @@ app.post("/login", async (req, res) => {
     if (err) {
       console.error(err);
       res.status(401).send(err);
-      // res.send(err);
       return;
     }
 
@@ -276,7 +184,6 @@ app.get("/authstatus", async (req, res) => {
   res.send(req.isAuthenticated());
 });
 
-/* ************ R O U T E R   F U N C T I O N S ************ */
 app.get("/", async (req, res) => {
   try {
     let generalStructure, allTransactions;
@@ -312,14 +219,15 @@ app.get("/", async (req, res) => {
 app.post("/", async (req, res) => {
   const { name, sum, globalId, subtypeName, typeName } = req.body;
   const now = new Date();
-  const date = `${now
-    .getDate()
-    .toString()}/${now.getMonth()}/${now.getFullYear()}`;
+  const date = `${now.getDate().toString()}/${
+    now.getMonth() + 1
+  }/${now.getFullYear()}`;
 
   const test = new Transaction({
     name: name,
     sum: Number(sum),
     date: date,
+    dateForDB: now,
     globalId: globalId,
     subtypeName: subtypeName,
     typeName: typeName,
@@ -576,4 +484,96 @@ async function removeTransaction(transaction, globalId) {
   } catch (error) {
     throw error;
   }
+}
+
+function populateModels() {
+  /* populate mongodb models with pre-defined values - 3 types "expenses", "incomes", "savings" & their subtypes */
+  const salaryIncome = new Subtype({
+    name: "Salary",
+    color: "#5F6F52",
+  });
+  const otherIncome = new Subtype({
+    name: "Other Incomes",
+    color: "#A9B388",
+  });
+
+  const savingsSubcat = new Subtype({
+    name: "General Savings",
+    color: "#EAC696",
+  });
+
+  const food = new Subtype({
+    name: "Food&Drinks",
+    color: "#C8AE7D",
+  });
+
+  const entertainment = new Subtype({
+    name: "Entertainment",
+    color: "#765827",
+  });
+
+  const housing = new Subtype({
+    name: "Rent/Mortgage",
+    color: "#65451F",
+  });
+
+  const bills = new Subtype({
+    name: "Bills",
+    color: "#6C3428",
+  });
+
+  const transportation = new Subtype({
+    name: "Transport",
+    color: "#186F65",
+  });
+
+  const beauty = new Subtype({
+    name: "Beauty",
+    color: "#BA704F",
+  });
+
+  const health = new Subtype({
+    name: "Health&Sports",
+    color: "#DFA878",
+  });
+
+  const miscellaneous = new Subtype({
+    name: "Miscellaneous",
+    color: "#DFA878",
+  });
+
+  const gifts = new Subtype({
+    name: "Gifts",
+    color: "#FF9B50",
+  });
+
+  const incomes = new Type({
+    name: "Incomes",
+    subtypes: [salaryIncome, otherIncome],
+    typeTotal: 0,
+  });
+
+  const expenses = new Type({
+    name: "Expenses",
+    subtypes: [
+      food,
+      entertainment,
+      housing,
+      bills,
+      transportation,
+      beauty,
+      health,
+      miscellaneous,
+      gifts,
+    ],
+    typeTotal: 0,
+  });
+
+  const savings = new Type({
+    name: "Savings",
+    subtypes: [savingsSubcat],
+    typeTotal: 0,
+  });
+
+  return [savings, expenses, incomes];
 }
