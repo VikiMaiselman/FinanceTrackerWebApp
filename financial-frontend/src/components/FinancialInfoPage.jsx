@@ -23,7 +23,6 @@ export default function FinancialInfoPage({ financeState, typeName, theme }) {
 
       if (sumForSubtype === 0) return {};
 
-      console.log(subtype);
       return {
         key: subtype._id,
         name: subtype.name,

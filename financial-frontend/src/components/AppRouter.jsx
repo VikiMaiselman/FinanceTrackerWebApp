@@ -10,6 +10,7 @@ import FinancialInfoPage from "./FinancialInfoPage";
 import MainPage from "./MainPage";
 import Logout from "./Logout";
 import Login from "./forms/Login";
+import Wishes from "./Wishes";
 import ErrorPage from "./ErrorPage";
 import "../styles/AllTransactions.css";
 import "../styles/NavigationBar.css";
@@ -264,6 +265,10 @@ export default function AppRouter() {
                   theme={theme}
                 />
               }
+            />
+            <Route
+              path="wishes"
+              element={<Wishes globalId={financeState.generalStructure._id} />}
             />
             <Route
               path="logout"

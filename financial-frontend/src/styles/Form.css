@@ -75,3 +75,24 @@
 .span-underline {
   text-decoration: underline;
 }
+
+.Transfer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5%;
+}
+
+.WishForm {
+  margin-bottom: 1.5%;
+  margin-top: 1%;
+}
+
+.Multiple-inputs {
+  background-color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
