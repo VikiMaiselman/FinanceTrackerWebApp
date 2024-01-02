@@ -81,7 +81,6 @@ export default function AppRouter() {
           { withCredentials: true },
           headers
         );
-        console.log("called backend to know if authenticated", response.data);
         setIsAuthenticated(response.data);
       } catch (error) {
         console.error(error);
@@ -154,10 +153,57 @@ export default function AppRouter() {
     fetchData();
   };
 
+  const transferToSavings = async (
+    fromIncomeTransaction,
+    amountForTransfer
+  ) => {
+    if (fromIncomeTransaction.sum < amountForTransfer) {
+      Swal.fire({
+        title: "Ooops!",
+        text: "Not enough money, choose another sum to transfer.",
+        icon: "error",
+      });
+      return;
+    }
+    try {
+      // update transaction of question - amount
+      fromIncomeTransaction.sum = fromIncomeTransaction.sum - amountForTransfer;
+      await updateTransaction(
+        fromIncomeTransaction,
+        fromIncomeTransaction.globalId
+      );
+
+      // create new transaction in savings with such amount and default name "transfer from incomes"
+      const newSavingsTransaction = {
+        globalId: fromIncomeTransaction.globalId,
+        name:
+          fromIncomeTransaction.typeName === "Incomes"
+            ? "Transfer from Incomes"
+            : "Transfer from Savings",
+        sum: amountForTransfer,
+        subtypeName:
+          fromIncomeTransaction.typeName === "Incomes"
+            ? "General Savings"
+            : "Other Incomes",
+        typeName:
+          fromIncomeTransaction.typeName === "Incomes" ? "Savings" : "Incomes",
+      };
+      await addTransaction(newSavingsTransaction);
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops! Could not transfer :(",
+        text: error.response.data,
+        icon: "error",
+      });
+    }
+  };
+
   const actions = {
     addTransaction: addTransaction,
     updateTransaction: updateTransaction,
     removeTransaction: removeTransaction,
+    transferToSavings: transferToSavings,
   };
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
@@ -168,8 +214,6 @@ export default function AppRouter() {
       fill: colorTypes[idx],
     };
   });
-
-  console.log("is auth? ", isAuthenticated);
 
   const toRender = financeState.generalStructure ? (
     isAuthenticated ? (

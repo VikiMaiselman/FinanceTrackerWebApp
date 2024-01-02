@@ -7,6 +7,8 @@ import CustomBarChart from "./CustomBarChart";
 import TransactionsContainer from "./TransactionsContainer";
 import CreateSubtypeForm from "./forms/CreateSubtypeForm";
 import RemoveSubtypeForm from "./forms/RemoveSubtypeForm";
+import Modal from "./Modal";
+import TransferForm from "./forms/TransferForm";
 import "../styles/AllTransactions.css";
 
 const url = "http://localhost:3007";
@@ -22,6 +24,9 @@ export default function MainPage({
   theme,
   updatePage,
 }) {
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [transactionOfTransfer, setTransactionDealtWith] = useState({});
+
   const addSubtype = async (newSubtype) => {
     if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
       Swal.fire({
@@ -139,6 +144,8 @@ export default function MainPage({
                 globalId={financeState.generalStructure._id}
                 type={type}
                 actions={actions}
+                setShouldShowModal={setShouldShowModal}
+                setTransactionDealtWith={setTransactionDealtWith}
               />
             </Grid>
           );
@@ -158,6 +165,21 @@ export default function MainPage({
           />
         </div>
       </div>
+      <Modal
+        shouldShowModal={shouldShowModal}
+        setShouldShowModal={setShouldShowModal}
+      >
+        <h2>You can transfer some money to your savings</h2>
+        <p>
+          "Do not save what is left after spending, but spend what is left after
+          saving" W.Baffet
+        </p>
+        <TransferForm
+          transferToSavings={actions.transferToSavings}
+          currentTransaction={transactionOfTransfer}
+          setShouldShowModal={setShouldShowModal}
+        />
+      </Modal>
     </div>
   );
 }

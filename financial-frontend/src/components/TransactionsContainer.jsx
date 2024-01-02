@@ -9,6 +9,8 @@ export default function TransactionsContainer({
   transactionsToDisplay,
   type,
   actions,
+  setShouldShowModal,
+  setTransactionDealtWith
 }) {
   const metadataForNewTransaction = {
     globalId: globalId,
@@ -37,6 +39,8 @@ export default function TransactionsContainer({
             isFullVersion={isFullVersion}
             txData={tx}
             metadata={metadataForNewTransaction}
+            setShouldShowModal={setShouldShowModal}
+            setTransactionDealtWith={setTransactionDealtWith}
           />
         );
       })}
