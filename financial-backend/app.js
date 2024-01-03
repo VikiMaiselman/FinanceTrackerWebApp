@@ -120,6 +120,7 @@ async function initializeDatabase() {
     name: String,
     description: String,
     imageURL: String,
+    linkURL: String,
     created: Date,
     dueDate: Date,
     neededSum: Number,
@@ -428,8 +429,9 @@ app.post("/wishes", async (req, res) => {
       name: wish.wishName,
       description: wish.wishDescription,
       imageURL: wish.imageURL,
+      linkURL: wish.linkURL,
       created: new Date().toISOString(),
-      dueDate: wish.dueDate,
+      dueDate: new Date(wish.dueDate),
       neededSum: wish.neededAmount,
       currentSum: 0,
     });
@@ -455,6 +457,37 @@ app.patch("/wishes", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(400).json("Could not update the sum.");
+  }
+});
+
+app.patch("/wishes/upd", async (req, res) => {
+  try {
+    const wishInQuestion = await Wish.findOne({ _id: req.body.wishId });
+
+    if (wishInQuestion) {
+      wishInQuestion.name = req.body.wish.wishName;
+      wishInQuestion.description = req.body.wish.wishDescription;
+      wishInQuestion.imageURL = req.body.wish.imageURL;
+      wishInQuestion.linkURL = req.body.wish.linkURL;
+      wishInQuestion.dueDate = new Date(req.body.wish.dueDate);
+      wishInQuestion.neededSum = Number(req.body.wish.neededAmount);
+      await wishInQuestion.save();
+    }
+
+    return res.json("Wish updated");
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not update the wish.");
+  }
+});
+
+app.post("/wishes/delete", async (req, res) => {
+  try {
+    await Wish.findByIdAndDelete(req.body.wishId);
+    return res.json("Wish deleted.");
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not delete the wish.");
   }
 });
 
