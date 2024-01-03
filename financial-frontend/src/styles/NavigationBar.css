@@ -9,6 +9,7 @@
 
   position: fixed;
   top: 0;
+  z-index: 1;
   width: 100%;
   margin-bottom: 50px;
 }
@@ -27,6 +28,9 @@
 }
 .Navbar-component a:hover {
   background-color: #3f3f3f;
+}
+.Navbar-component:first-child a {
+  font-size: larger;
 }
 
 .scroll {

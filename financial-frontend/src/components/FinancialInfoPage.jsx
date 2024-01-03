@@ -36,7 +36,7 @@ export default function FinancialInfoPage({ financeState, typeName, theme }) {
 
   return (
     <div className="AllTransactions">
-      <h1>
+      <h1 className="Header">
         My Total {typeName}:{" "}
         {typeName === "Expenses" ? type.typeTotal * -1 : type.typeTotal}₪
       </h1>

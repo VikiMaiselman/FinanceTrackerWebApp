@@ -16,6 +16,9 @@ export default function CustomPieChart({ data }) {
         innerRadius={60}
         outerRadius={90}
         fill={`#${data.fill}`}
+        textAnchor="middle"
+        dominantBaseline="central"
+        paddingAngle={15}
         label={renderLabel}
       />
     </PieChart>

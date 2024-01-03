@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Grid } from "@mui/material";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -117,7 +117,9 @@ export default function MainPage({
 
   return (
     <div className="AllTransactions">
-      <h1>My Total Financial State: {financeState.generalStructure.total}₪</h1>
+      <h1 className="Header">
+        My Total Financial State: {financeState.generalStructure.total}₪
+      </h1>
 
       {financeState.generalStructure.total !== 0 && (
         <CustomBarChart data={dataForChart} />

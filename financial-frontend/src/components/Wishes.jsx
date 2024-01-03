@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Button } from "@mui/material";
+import ReorderTwoToneIcon from "@mui/icons-material/ReorderTwoTone";
 import CustomCard from "./CustomCard";
 import Modal from "./Modal";
 import WishForm from "./forms/WishForm";
@@ -14,6 +16,17 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
+const theme = createTheme({
+  palette: {
+    transfer: {
+      main: "#5f6f52",
+      light: "#E9DB5D",
+      dark: "#A29415",
+      contrastText: "#ffffff",
+    },
+  },
+});
+
 export default function Wishes({ globalId }) {
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [wishes, setWishes] = useState([]);
@@ -21,7 +34,6 @@ export default function Wishes({ globalId }) {
   const getWishes = async () => {
     try {
       const result = await axios.get(url, { withCredentials: true }, headers);
-      console.log(result.data);
       setWishes(result.data);
     } catch (error) {
       console.error(error);
@@ -39,6 +51,10 @@ export default function Wishes({ globalId }) {
 
   const addWish = async (wish) => {
     wish.dueDate = new Date(wish.dueDate).toISOString();
+    if (!wish.imageURL) {
+      wish.imageURL =
+        "https://cdn.pixabay.com/photo/2015/05/24/21/19/wish-782424_1280.jpg";
+    }
 
     try {
       await axios.post(
@@ -66,6 +82,38 @@ export default function Wishes({ globalId }) {
     getWishes();
   };
 
+  const updateWish = async (wish, wishId) => {
+    if (!wish.imageURL) {
+      wish.imageURL =
+        "https://cdn.pixabay.com/photo/2015/05/24/21/19/wish-782424_1280.jpg";
+    }
+
+    try {
+      await axios.patch(
+        `${url}/upd`,
+        { wish: wish, wishId: wishId },
+        { withCredentials: true },
+        headers
+      );
+      Swal.fire({
+        title: "Success!",
+        text: `Wish successfully updated!`,
+        icon: "success",
+        confirmButtonColor: "#5f6f52",
+        iconColor: "#5f6f52",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops! The operation failed.",
+        text: error.response.data,
+        icon: "error",
+      });
+    }
+
+    getWishes();
+  };
+
   const updateCurSum = async (currentSum, wishId) => {
     try {
       await axios.patch(
@@ -74,7 +122,6 @@ export default function Wishes({ globalId }) {
         { withCredentials: true },
         headers
       );
-      console.log("?????????");
       Swal.fire({
         title: "Success!",
         text: `Wish updated by ${currentSum}₪!`,
@@ -82,7 +129,42 @@ export default function Wishes({ globalId }) {
         confirmButtonColor: "#5f6f52",
         iconColor: "#5f6f52",
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops! The operation failed.",
+        text: error.response.data,
+        icon: "error",
+      });
+    }
+
+    getWishes();
+  };
+
+  const deleteWish = async (wishId) => {
+    try {
+      await axios.post(
+        `${url}/delete`,
+        { wishId: wishId },
+        { withCredentials: true },
+        headers
+      );
+
+      Swal.fire({
+        title: "Success!",
+        text: `Wish successfully removed!!`,
+        icon: "success",
+        confirmButtonColor: "#5f6f52",
+        iconColor: "#5f6f52",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops! The operation failed.",
+        text: error.response.data,
+        icon: "error",
+      });
+    }
 
     getWishes();
   };
@@ -94,29 +176,38 @@ export default function Wishes({ globalId }) {
 
   return (
     <>
-      <h1>My wishes:</h1>
+      <h1 className="Wishlist-header Header">
+        <ReorderTwoToneIcon
+          sx={{ fontSize: "2.6rem", verticalAlign: "middle" }}
+        />
+        My Wishlist:
+      </h1>
+
       <div className="Wishes-list">
         {wishes.map((wish) => {
-          {
-            /* console.log(wish); */
-          }
           return (
             <CustomCard
               key={wish._id}
               id={wish._id}
-              imgUrl={wish.imageURL}
-              name={wish.name}
-              description={wish.description}
-              dueDate={wish.dueDate}
-              neededSum={wish.neededSum}
-              currentSum={wish.currentSum}
+              wish={wish}
               updateCurSum={updateCurSum}
+              deleteWish={deleteWish}
+              updateWish={updateWish}
             />
           );
         })}
       </div>
 
-      <Button onClick={handleClick}>Create new wish</Button>
+      <ThemeProvider theme={theme}>
+        <Button
+          onClick={handleClick}
+          variant="contained"
+          color="transfer"
+          sx={{ marginTop: "2.5%", marginBottom: "2.5%" }}
+        >
+          Create new wish
+        </Button>
+      </ThemeProvider>
 
       <Modal
         shouldShowModal={shouldShowModal}
@@ -124,7 +215,11 @@ export default function Wishes({ globalId }) {
         isBig={true}
       >
         <h2 className="Modal-h2-header">Create a new wish</h2>
-        <WishForm addWish={addWish} setShouldShowModal={setShouldShowModal} />
+        <WishForm
+          action={addWish}
+          setShouldShowModal={setShouldShowModal}
+          buttonText="Add wish"
+        />
       </Modal>
     </>
   );
