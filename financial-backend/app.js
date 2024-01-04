@@ -230,7 +230,24 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/", async (req, res) => {
-  const { name, sum, globalId, subtypeName, typeName } = req.body;
+  const { name, sum, subtypeName, typeName } = req.body;
+
+  const userFinancialInfo = await Global.findOne({ user: req.user });
+  const globalId = userFinancialInfo._id;
+
+  if (subtypeName === "Wishes Fund") {
+    const wishesFundTransaction = await Transaction.findOne({
+      globalId: globalId,
+      subtypeName: "Wishes Fund",
+    });
+
+    wishesFundTransaction &&
+      res
+        .status(400)
+        .json("This is a fund for wishes. Only one can exist at each time.");
+    return;
+  }
+
   const now = new Date();
   const date = `${now.getDate().toString()}/${
     now.getMonth() + 1
@@ -263,7 +280,11 @@ app.post("/", async (req, res) => {
 
 app.post("/deleteTransaction", async (req, res) => {
   try {
-    const { transaction, globalId } = req.body;
+    const { transaction } = req.body;
+
+    const userFinancialInfo = await Global.findOne({ user: req.user });
+    const globalId = userFinancialInfo._id;
+
     await removeTransaction(transaction, globalId);
     return res.status(200).json("Successfully removed the transaction.");
   } catch (error) {
@@ -277,9 +298,12 @@ app.post("/deleteTransaction", async (req, res) => {
 });
 
 app.post("/updateTransaction", async (req, res) => {
-  const { transaction, globalId } = req.body;
+  const { transaction } = req.body;
 
   try {
+    const userFinancialInfo = await Global.findOne({ user: req.user });
+    const globalId = userFinancialInfo._id;
+
     const result = await Transaction.findOneAndUpdate(
       { _id: transaction._id },
       {
@@ -307,10 +331,25 @@ app.post("/updateTransaction", async (req, res) => {
   }
 });
 
+app.get("/transaction", async (req, res) => {
+  try {
+    const userFinancialInfo = await Global.findOne({ user: req.user });
+    const globalId = userFinancialInfo._id;
+
+    const transaction = await Transaction.findOne({
+      globalId: globalId,
+      subtypeName: "Wishes Fund",
+    });
+    return res.json(transaction);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json("Could not get info about transaction.");
+  }
+});
+
 app.post("/addSubtype", async (req, res) => {
   const {
     newSubtype: { name, color },
-    globalId,
     typeName,
   } = req.body;
 
@@ -319,8 +358,10 @@ app.post("/addSubtype", async (req, res) => {
       .status(400)
       .json("Please, enter all the required fields to create a category.");
 
-  const globalObj = await Global.findOne({ _id: globalId });
-  const hasThisSubtypeAlready = globalObj.types
+  const userFinancialInfo = await Global.findOne({ user: req.user });
+  const globalId = userFinancialInfo._id;
+
+  const hasThisSubtypeAlready = userFinancialInfo.types
     .find((type) => type.name === typeName)
     .subtypes.some((subtype) => subtype.name === name);
 
@@ -364,7 +405,6 @@ app.post("/removeSubtype", async (req, res) => {
 
   const {
     subtype: { name, _id },
-    globalId,
     typeName,
   } = req.body;
 
@@ -376,6 +416,9 @@ app.post("/removeSubtype", async (req, res) => {
       );
 
   try {
+    const userFinancialInfo = await Global.findOne({ user: req.user });
+    const globalId = userFinancialInfo._id;
+
     // 1. Remove the subtype
     await Global.updateOne(
       { _id: globalId },
@@ -421,9 +464,12 @@ app.get("/wishes", async (req, res) => {
 });
 
 app.post("/wishes", async (req, res) => {
-  const { wish, globalId } = req.body;
+  const { wish } = req.body;
 
   try {
+    const userFinancialInfo = await Global.findOne({ user: req.user });
+    const globalId = userFinancialInfo._id;
+
     const newWish = new Wish({
       globalId: globalId,
       name: wish.wishName,
@@ -597,6 +643,11 @@ function populateModels() {
     color: "#EAC696",
   });
 
+  const savingsWishes = new Subtype({
+    name: "Wishes Fund",
+    color: "#483434",
+  });
+
   const food = new Subtype({
     name: "Food&Drinks",
     color: "#C8AE7D",
@@ -642,6 +693,11 @@ function populateModels() {
     color: "#FF9B50",
   });
 
+  const wishes = new Subtype({
+    name: "My Wishes",
+    color: "#3F4E4F",
+  });
+
   const incomes = new Type({
     name: "Incomes",
     subtypes: [salaryIncome, otherIncome],
@@ -660,13 +716,14 @@ function populateModels() {
       health,
       miscellaneous,
       gifts,
+      wishes,
     ],
     typeTotal: 0,
   });
 
   const savings = new Type({
     name: "Savings",
-    subtypes: [savingsSubcat],
+    subtypes: [savingsSubcat, savingsWishes],
     typeTotal: 0,
   });
 
