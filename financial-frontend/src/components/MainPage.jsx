@@ -33,12 +33,13 @@ export default function MainPage({
         title: "Ooops!",
         text: "Fill in all the fields, please.",
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
       return;
     }
     const dataForBackend = {
       newSubtype: newSubtype,
-      globalId: financeState.generalStructure._id,
       typeName: newSubtype.typeName,
     };
 
@@ -62,6 +63,8 @@ export default function MainPage({
         title: "Ooops!",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
@@ -74,13 +77,14 @@ export default function MainPage({
         title: "Ooops!",
         text: "Fill in all the fields, please.",
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
       return;
     }
 
     const dataForBackend = {
       subtype: subtype,
-      globalId: financeState.generalStructure._id,
       typeName: typeName,
     };
 
@@ -104,6 +108,8 @@ export default function MainPage({
         title: "Ooops!",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
@@ -143,7 +149,6 @@ export default function MainPage({
                 key={type._id}
                 isFullVersion={true}
                 transactionsToDisplay={transactionsOfThisType}
-                globalId={financeState.generalStructure._id}
                 type={type}
                 actions={actions}
                 setShouldShowModal={setShouldShowModal}
@@ -174,10 +179,10 @@ export default function MainPage({
         <h2>You can transfer some money to your savings</h2>
         <p>
           "Do not save what is left after spending, but spend what is left after
-          saving" W.Baffet
+          saving." W.Baffet
         </p>
         <TransferForm
-          transferToSavings={actions.transferToSavings}
+          transferAction={actions.transfer}
           currentTransaction={transactionOfTransfer}
           setShouldShowModal={setShouldShowModal}
         />

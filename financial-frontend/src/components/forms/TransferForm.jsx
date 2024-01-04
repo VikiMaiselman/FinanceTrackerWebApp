@@ -17,7 +17,7 @@ const theme = createTheme({
 
 export default function TransferForm({
   currentTransaction,
-  transferToSavings,
+  transferAction,
   setShouldShowModal,
 }) {
   const [transfer, setTransfer] = useState({
@@ -36,7 +36,7 @@ export default function TransferForm({
 
   const handleClick = (event) => {
     event.preventDefault();
-    transferToSavings(currentTransaction, transfer.amountToTransfer);
+    transferAction(currentTransaction, transfer.amountToTransfer);
     setShouldShowModal(false);
     setTransfer({
       amountToTransfer: "",

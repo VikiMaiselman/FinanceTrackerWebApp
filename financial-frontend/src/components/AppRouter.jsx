@@ -101,17 +101,19 @@ export default function AppRouter() {
         title: "Ooops!",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
     fetchData();
   };
 
-  const updateTransaction = async (transaction, globalId) => {
+  const updateTransaction = async (transaction) => {
     const dataForBackend = {
       transaction: transaction,
-      globalId: globalId,
     };
+
     try {
       await axios.post(
         `${url}/updateTransaction`,
@@ -125,16 +127,17 @@ export default function AppRouter() {
         title: "Ooops!",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
     fetchData();
   };
 
-  const removeTransaction = async (transaction, globalId) => {
+  const removeTransaction = async (transaction) => {
     const dataForBackend = {
       transaction: transaction,
-      globalId: globalId,
     };
     try {
       await axios.post(
@@ -149,53 +152,84 @@ export default function AppRouter() {
         title: "Ooops!",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
     fetchData();
   };
 
-  const transferToSavings = async (
-    fromIncomeTransaction,
-    amountForTransfer
+  const transfer = async (
+    fromTransaction,
+    amountForTransfer,
+    isTransferToWish
   ) => {
-    if (fromIncomeTransaction.sum < amountForTransfer) {
+    if (fromTransaction.sum < amountForTransfer) {
       Swal.fire({
         title: "Ooops!",
         text: "Not enough money, choose another sum to transfer.",
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
       return;
     }
+
     try {
       // update transaction of question - amount
-      fromIncomeTransaction.sum = fromIncomeTransaction.sum - amountForTransfer;
-      await updateTransaction(
-        fromIncomeTransaction,
-        fromIncomeTransaction.globalId
-      );
+      fromTransaction.sum = fromTransaction.sum - amountForTransfer;
+      await updateTransaction(fromTransaction);
 
-      // create new transaction in savings with such amount and default name "transfer from incomes"
-      const newSavingsTransaction = {
-        globalId: fromIncomeTransaction.globalId,
-        name:
-          fromIncomeTransaction.typeName === "Incomes"
-            ? "Transfer from Incomes"
-            : "Transfer from Savings",
-        sum: amountForTransfer,
-        subtypeName:
-          fromIncomeTransaction.typeName === "Incomes"
-            ? "General Savings"
-            : "Other Incomes",
-        typeName:
-          fromIncomeTransaction.typeName === "Incomes" ? "Savings" : "Incomes",
-      };
-      await addTransaction(newSavingsTransaction);
+      if (!isTransferToWish) {
+        const newTransaction = {
+          name:
+            fromTransaction.typeName === "Incomes"
+              ? "Transfer from Incomes"
+              : "Transfer from Savings",
+          sum: amountForTransfer,
+          subtypeName:
+            fromTransaction.typeName === "Incomes"
+              ? "General Savings"
+              : "Other Incomes",
+          typeName:
+            fromTransaction.typeName === "Incomes" ? "Savings" : "Incomes",
+        };
+        await addTransaction(newTransaction);
+      }
+
+      // if all money wa transfered let the user decide if delete the original transaction
+      if (
+        fromTransaction.sum === 0 &&
+        fromTransaction.subtypeName !== "Wishes Fund"
+      ) {
+        const result = await Swal.fire({
+          title: "Want to delete original the transaction?",
+          text: "There are no money left on it after money transfer",
+          icon: "warning",
+          iconColor: "#5f6f52",
+          showCancelButton: true,
+          confirmButtonColor: "#5f6f52",
+          cancelButtonColor: "#FBF0DF",
+          cancelButtonText: "<p style='color:black'>No</p>",
+          confirmButtonText: "Yes, delete it!",
+        });
+        if (result.isConfirmed) {
+          await removeTransaction(fromTransaction);
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      }
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Ooops! Could not transfer :(",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
   };
@@ -204,7 +238,7 @@ export default function AppRouter() {
     addTransaction: addTransaction,
     updateTransaction: updateTransaction,
     removeTransaction: removeTransaction,
-    transferToSavings: transferToSavings,
+    transfer: transfer,
   };
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
@@ -268,7 +302,9 @@ export default function AppRouter() {
             />
             <Route
               path="wishes"
-              element={<Wishes globalId={financeState.generalStructure._id} />}
+              element={
+                <Wishes fulfillWish={addTransaction} transferMoney={transfer} />
+              }
             />
             <Route
               path="logout"

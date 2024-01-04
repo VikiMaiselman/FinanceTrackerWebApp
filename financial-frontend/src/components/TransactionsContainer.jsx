@@ -5,7 +5,6 @@ import "../styles/TransactionsContainer.css";
 
 export default function TransactionsContainer({
   isFullVersion,
-  globalId,
   transactionsToDisplay,
   type,
   actions,
@@ -13,7 +12,6 @@ export default function TransactionsContainer({
   setTransactionDealtWith
 }) {
   const metadataForNewTransaction = {
-    globalId: globalId,
     actions: actions,
     type: type,
   };

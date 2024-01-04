@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Tooltip } from "@mui/material";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import "../../styles/Form.css";
 
@@ -6,7 +7,6 @@ export default function CreateTransactionForm({ metadata }) {
   const [tx, setTx] = useState({
     name: "",
     sum: "",
-    globalId: metadata.globalId,
     subtypeName: "",
     typeName: metadata.type.name,
   });
@@ -34,7 +34,6 @@ export default function CreateTransactionForm({ metadata }) {
     setTx({
       name: "",
       sum: "",
-      globalId: metadata.globalId,
       subtypeName: "",
       typeName: metadata.type.name,
     });
@@ -73,9 +72,11 @@ export default function CreateTransactionForm({ metadata }) {
         })}
       </datalist>
       <div>
-        <button onClick={handleClick}>
-          <AddCircleOutlineSharpIcon sx={{ color: "#706233" }} />
-        </button>
+        <Tooltip title="Add">
+          <button onClick={handleClick}>
+            <AddCircleOutlineSharpIcon sx={{ color: "#706233" }} />
+          </button>
+        </Tooltip>
       </div>
     </form>
   );

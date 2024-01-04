@@ -11,7 +11,6 @@ export default function UpdateTransactionForm({
     _id: txData._id,
     name: txData.name,
     sum: txData.sum,
-    globalId: metadata.globalId,
     subtypeName: txData.subtypeName,
     typeName: metadata.type.name,
   });
@@ -35,7 +34,7 @@ export default function UpdateTransactionForm({
 
   const handleClick = (event) => {
     event.preventDefault();
-    updateTransaction(tx, metadata.globalId);
+    updateTransaction(tx);
     setIsEditable(false);
   };
 

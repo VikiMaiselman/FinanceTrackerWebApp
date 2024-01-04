@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import UpdateTransactionForm from "./forms/UpdateTransactionForm";
@@ -32,36 +33,44 @@ export default function Transaction({
       {isFullVersion && <p>({subtypeName})</p>}
       {isFullVersion && (
         <div className="Transaction-data">
-          {isFullVersion && (metadata.type.name === "Incomes" || metadata.type.name === "Savings") ? (
+          {isFullVersion &&
+          (metadata.type.name === "Incomes" ||
+            metadata.type.name === "Savings") ? (
+            <Tooltip title="Transfer">
+              <button
+                className="Transaction-handlerBtn"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setShouldShowModal(true);
+                  setTransactionDealtWith(txData);
+                }}
+              >
+                <SyncAltIcon sx={{ color: "#706233" }} />
+              </button>
+            </Tooltip>
+          ) : null}
+          <Tooltip title="Edit">
             <button
               className="Transaction-handlerBtn"
               onClick={(event) => {
                 event.preventDefault();
-                setShouldShowModal(true);
-                setTransactionDealtWith(txData);
+                setIsEditable(true);
               }}
             >
-              <SyncAltIcon sx={{ color: "#706233" }} />
+              <EditIcon sx={{ color: "#706233" }} />
             </button>
-          ) : null}
-          <button
-            className="Transaction-handlerBtn"
-            onClick={(event) => {
-              event.preventDefault();
-              setIsEditable(true);
-            }}
-          >
-            <EditIcon sx={{ color: "#706233" }} />
-          </button>
-          <button
-            className="Transaction-handlerBtn"
-            onClick={(event) => {
-              event.preventDefault();
-              removeTransaction?.(txData, metadata.globalId);
-            }}
-          >
-            <DeleteIcon sx={{ color: "#706233" }} />
-          </button>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <button
+              className="Transaction-handlerBtn"
+              onClick={(event) => {
+                event.preventDefault();
+                removeTransaction?.(txData);
+              }}
+            >
+              <DeleteIcon sx={{ color: "#706233" }} />
+            </button>
+          </Tooltip>
         </div>
       )}
     </div>

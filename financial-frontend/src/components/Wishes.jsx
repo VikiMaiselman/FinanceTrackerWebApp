@@ -27,7 +27,7 @@ const theme = createTheme({
   },
 });
 
-export default function Wishes({ globalId }) {
+export default function Wishes({ fulfillWish, transferMoney }) {
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [wishes, setWishes] = useState([]);
 
@@ -41,6 +41,8 @@ export default function Wishes({ globalId }) {
         title: "Ooops! The operation failed.",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
   };
@@ -57,12 +59,7 @@ export default function Wishes({ globalId }) {
     }
 
     try {
-      await axios.post(
-        url,
-        { wish: wish, globalId: globalId },
-        { withCredentials: true },
-        headers
-      );
+      await axios.post(url, { wish: wish }, { withCredentials: true }, headers);
       Swal.fire({
         title: "Success!",
         text: "Wish added!",
@@ -76,6 +73,8 @@ export default function Wishes({ globalId }) {
         title: "Ooops! The operation failed.",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
@@ -108,6 +107,8 @@ export default function Wishes({ globalId }) {
         title: "Ooops! The operation failed.",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
@@ -135,13 +136,15 @@ export default function Wishes({ globalId }) {
         title: "Ooops! The operation failed.",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
     getWishes();
   };
 
-  const deleteWish = async (wishId) => {
+  const deleteWish = async (wishId, toFullfill) => {
     try {
       await axios.post(
         `${url}/delete`,
@@ -152,7 +155,7 @@ export default function Wishes({ globalId }) {
 
       Swal.fire({
         title: "Success!",
-        text: `Wish successfully removed!!`,
+        text: `Wish successfully ${toFullfill ? "fulfilled" : "removed"}!`,
         icon: "success",
         confirmButtonColor: "#5f6f52",
         iconColor: "#5f6f52",
@@ -163,6 +166,8 @@ export default function Wishes({ globalId }) {
         title: "Ooops! The operation failed.",
         text: error.response.data,
         icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
       });
     }
 
@@ -193,6 +198,8 @@ export default function Wishes({ globalId }) {
               updateCurSum={updateCurSum}
               deleteWish={deleteWish}
               updateWish={updateWish}
+              fulfillWish={fulfillWish}
+              transferMoney={transferMoney}
             />
           );
         })}
