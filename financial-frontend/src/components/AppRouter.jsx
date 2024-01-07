@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useStateWithCallbackLazy } from "use-state-with-callback";
 import { createTheme } from "@mui/material";
-import axios from "axios";
+import axios, { all } from "axios";
 import Swal from "sweetalert2";
 
 import Navbar from "./Navbar";
@@ -14,6 +14,9 @@ import Wishes from "./Wishes";
 import ErrorPage from "./ErrorPage";
 import "../styles/AllTransactions.css";
 import "../styles/NavigationBar.css";
+
+import "react-datepicker/dist/react-datepicker.css";
+import { addMonths } from "date-fns";
 
 const url = "http://localhost:3007";
 const headers = {
@@ -46,6 +49,8 @@ export default function AppRouter() {
     message: "",
   });
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
   const getFinanceState = async () => {
     try {
       const response = await axios.get(url, { withCredentials: true }, headers);
@@ -53,10 +58,20 @@ export default function AppRouter() {
       const generalStructure = finance.generalStructure;
       const allTransactions = finance.allTransactions;
 
+      const transactionsOfThisMonth = allTransactions.filter((tx) => {
+        const monthOfTx = new Date(tx.dateForDB).getMonth();
+        const yearOfTx = new Date(tx.dateForDB).getFullYear();
+
+        const targetMonth = selectedDate.getMonth();
+        const targetYear = selectedDate.getFullYear();
+
+        return monthOfTx === targetMonth && yearOfTx === targetYear;
+      });
+
       const updateFinanceState = (prevState) => {
         return {
           ...prevState,
-          allTransactions: allTransactions,
+          allTransactions: transactionsOfThisMonth,
           generalStructure: generalStructure,
         };
       };
@@ -88,9 +103,30 @@ export default function AppRouter() {
       }
     };
     getAuthStatus();
-
     fetchData();
   }, [isAuthenticated]);
+
+  const handleChange2 = (date) => {
+    setSelectedDate(date);
+  };
+  const handlePrevMonth = async () => {
+    setSelectedDate(addMonths(selectedDate, -1));
+  };
+  const handleNextMonth = () => {
+    setSelectedDate(addMonths(selectedDate, 1));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [selectedDate]);
+
+  const handleMonths = {
+    handlePrevMonth: handlePrevMonth,
+    handleNextMonth: handleNextMonth,
+    handleChange2: handleChange2,
+    setSelectedDate: setSelectedDate,
+    selectedDate: selectedDate,
+  };
 
   const addTransaction = async (newTransaction) => {
     try {
@@ -243,9 +279,12 @@ export default function AppRouter() {
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
   const data = financeState.generalStructure?.types?.map((type, idx) => {
+    const subtotal = financeState.allTransactions
+      .filter((tx) => tx.typeName === type.name)
+      .reduce((acc, tx) => acc + tx.sum, 0);
     return {
       name: type.name,
-      subtotal: type.typeTotal < 0 ? type.typeTotal * -1 : type.typeTotal,
+      subtotal: subtotal,
       fill: colorTypes[idx],
     };
   });
@@ -266,6 +305,7 @@ export default function AppRouter() {
                   updatePage={fetchData}
                   dataForChart={data}
                   actions={actions}
+                  handleMonths={handleMonths}
                   theme={theme}
                 />
               }
@@ -275,6 +315,8 @@ export default function AppRouter() {
               element={
                 <FinancialInfoPage
                   financeState={financeState}
+                  dataForChart={data}
+                  handleMonths={handleMonths}
                   typeName="Expenses"
                   theme={theme}
                 />
@@ -285,6 +327,7 @@ export default function AppRouter() {
               element={
                 <FinancialInfoPage
                   financeState={financeState}
+                  handleMonths={handleMonths}
                   typeName="Incomes"
                   theme={theme}
                 />
@@ -295,6 +338,7 @@ export default function AppRouter() {
               element={
                 <FinancialInfoPage
                   financeState={financeState}
+                  handleMonths={handleMonths}
                   typeName="Savings"
                   theme={theme}
                 />

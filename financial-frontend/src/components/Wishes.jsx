@@ -53,7 +53,7 @@ export default function Wishes({ fulfillWish, transferMoney }) {
 
   const addWish = async (wish) => {
     wish.dueDate = new Date(wish.dueDate).toISOString();
-    if (!wish.imageURL) {
+    if (!wish.imageURL || !wish.imageURL.startsWith("http://") || !wish.imageURL.startsWith("https://") ) {
       wish.imageURL =
         "https://cdn.pixabay.com/photo/2015/05/24/21/19/wish-782424_1280.jpg";
     }

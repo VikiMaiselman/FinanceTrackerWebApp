@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Grid } from "@mui/material";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { Grid, Button, Tooltip } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import SwipeLeftIcon from "@mui/icons-material/SwipeLeft";
+import SwipeRightIcon from "@mui/icons-material/SwipeRight";
 
 import CustomBarChart from "./CustomBarChart";
 import TransactionsContainer from "./TransactionsContainer";
@@ -11,16 +14,32 @@ import Modal from "./Modal";
 import TransferForm from "./forms/TransferForm";
 import "../styles/AllTransactions.css";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
+
 const url = "http://localhost:3007";
 const headers = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
+const themeMonths = createTheme({
+  palette: {
+    colors: {
+      main: "#5f6f52",
+      light: "#E9DB5D",
+      dark: "#A29415",
+      contrastText: "#ffffff",
+    },
+  },
+});
+
 export default function MainPage({
   financeState,
   dataForChart,
   actions,
+  handleMonths,
   theme,
   updatePage,
 }) {
@@ -131,7 +150,49 @@ export default function MainPage({
         <CustomBarChart data={dataForChart} />
       )}
 
-      <Grid container className="AllTransactions-contents" spacing={8}>
+      <div>
+        <h1 style={{ fontWeight: "lighter" }}>My transactions as of: </h1>
+        <div className="Main-month">
+          <ThemeProvider theme={themeMonths}>
+            <Tooltip title="Previous month" placement="bottom">
+              <Button
+                onClick={handleMonths.handlePrevMonth}
+                color="colors"
+                sx={{ marginTop: "2.5%" }}
+              >
+                <SwipeLeftIcon />
+              </Button>
+            </Tooltip>
+          </ThemeProvider>
+          <h1>{format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
+          <ThemeProvider theme={themeMonths}>
+            <Tooltip title="Next month" placement="bottom">
+              <Button
+                onClick={handleMonths.handleNextMonth}
+                color="colors"
+                sx={{ marginTop: "2.5%" }}
+              >
+                <SwipeRightIcon />
+              </Button>
+            </Tooltip>
+          </ThemeProvider>
+        </div>
+        <DatePicker
+          className="DatePicker"
+          selected={handleMonths.selectedDate}
+          onChange={handleMonths.handleChange2}
+          dateFormat="MMMM yyyy"
+          showMonthYearPicker
+        />
+      </div>
+
+      {/* Transactions themselves:  */}
+      <Grid
+        container
+        className="AllTransactions-contents"
+        spacing={8}
+        sx={{ marginTop: "-112px" }}
+      >
         {financeState.generalStructure.types.map((type) => {
           const transactionsOfThisType = financeState.allTransactions.filter(
             (tx) => tx.typeName === type.name

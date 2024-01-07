@@ -44,11 +44,6 @@ export default function CustomCard({
     const { value } = event.target;
     setCurrentSumLocal(+value);
   };
-  const handleChangeTransferSum = (event) => {
-    const { value } = event.target;
-    setCurrentSumTransfer(+value);
-  };
-
   const handleAddSum = (event) => {
     if (event.key === "Enter" || event.type === "click") {
       event.preventDefault();
@@ -109,6 +104,11 @@ export default function CustomCard({
     } catch (error) {
       throw error;
     }
+  };
+
+  const handleChangeTransferSum = (event) => {
+    const { value } = event.target;
+    setCurrentSumTransfer(+value);
   };
 
   const handleTransfer = async (event) => {
@@ -196,9 +196,11 @@ export default function CustomCard({
           <Typography variant="body2" color="#706233">
             {descriptionPart1} {descriptionPart2}
           </Typography>
-          <Typography variant="body2" color="#706233">
-            <b>Link: </b> {wish.linkURL}
-          </Typography>
+          {wish.linkURL ? (
+            <Typography variant="body2" color="#706233">
+              <b>Link: </b> <a href={wish.linkURL}>Go to wish page</a>
+            </Typography>
+          ) : null}
           <Typography variant="body2" color="#706233">
             <b>Due date:</b> {new Date(wish.dueDate).toDateString()}
           </Typography>

@@ -1,22 +1,70 @@
 import React from "react";
-import { Grid } from "@mui/material";
+
+import { Grid, Button, Tooltip } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import SwipeLeftIcon from "@mui/icons-material/SwipeLeft";
+import SwipeRightIcon from "@mui/icons-material/SwipeRight";
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 import TransactionsContainer from "./TransactionsContainer";
 import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
 
-export default function FinancialInfoPage({ financeState, typeName, theme }) {
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const themeMonths = createTheme({
+  palette: {
+    colors: {
+      main: "#483433",
+      light: "#E9DB5D",
+      dark: "#A29415",
+      contrastText: "#ffffff",
+    },
+  },
+});
+
+export default function FinancialInfoPage({
+  financeState,
+  handleMonths,
+  typeName,
+  theme,
+}) {
   const type = financeState.generalStructure.types.find(
     (type) => type.name === typeName
   );
   const typeTransactions = financeState.allTransactions.filter(
     (tx) => tx.typeName === typeName
   );
+  const totalSumThisMonth = typeTransactions.reduce(
+    (acc, tx) => acc + tx.sum,
+    0
+  );
+  const typeTotal = financeState.generalStructure.types.find(
+    (type) => type.name === typeName
+  ).typeTotal;
+
   const dataForChart = type.subtypes
     .map((subtype) => {
       const associatedTransactions = typeTransactions.filter(
         (tx) => tx.subtypeName === subtype.name
       );
+
       const sumForSubtype = associatedTransactions
         .flat()
         .reduce((acc, tx) => acc + tx.sum, 0);
@@ -37,9 +85,54 @@ export default function FinancialInfoPage({ financeState, typeName, theme }) {
   return (
     <div className="AllTransactions">
       <h1 className="Header">
-        My Total {typeName}:{" "}
-        {typeName === "Expenses" ? type.typeTotal * -1 : type.typeTotal}₪
+        My {typeName}
+        <Tooltip
+          sx={{ minWidth: "max-content" }}
+          title={
+            <h3>
+              Total {typeName} (all months):{" "}
+              {Math.sign(typeTotal) === -1 ? typeTotal * -1 : typeTotal}₪
+            </h3>
+          }
+        >
+          *
+        </Tooltip>
+        : {totalSumThisMonth}₪{" "}
       </h1>
+      <div>
+        <div className="Main-month">
+          <ThemeProvider theme={themeMonths}>
+            <Tooltip title="Previous month" placement="bottom">
+              <Button
+                onClick={handleMonths.handlePrevMonth}
+                color="colors"
+                sx={{ marginTop: "2.5%" }}
+              >
+                <SwipeLeftIcon />
+              </Button>
+            </Tooltip>
+          </ThemeProvider>
+          <h1>in {format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
+          <ThemeProvider theme={themeMonths}>
+            <Tooltip title="Next month" placement="bottom">
+              <Button
+                onClick={handleMonths.handleNextMonth}
+                color="colors"
+                sx={{ marginTop: "2.5%" }}
+              >
+                <SwipeRightIcon />
+              </Button>
+            </Tooltip>
+          </ThemeProvider>
+        </div>
+        <DatePicker
+          className="DatePicker"
+          selected={handleMonths.selectedDate}
+          onChange={handleMonths.handleChange2}
+          dateFormat="MMMM yyyy"
+          showMonthYearPicker
+        />
+      </div>
 
       {type.typeTotal !== 0 && <CustomPieChart data={dataForChart} />}
 

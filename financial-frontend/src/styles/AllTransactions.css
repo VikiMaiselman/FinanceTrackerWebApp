@@ -3,7 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 30px;
   width: 100%;
   margin-top: 50px;
 }
@@ -41,4 +41,19 @@
   letter-spacing: 1px;
   font-family: "Caudex", serif;
   font-size: 1.5rem;
+}
+
+.Main-month {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.DatePicker {
+  border-radius: 5px;
+  border: 0.5px solid;
+  font-family: "Caudex", serif;
+  color: #a29415;
+  width: 8em;
+  padding: 1px 5px;
 }

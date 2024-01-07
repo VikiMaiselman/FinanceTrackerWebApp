@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
 import { Tooltip } from "@mui/material";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import "../../styles/Form.css";
@@ -30,6 +31,23 @@ export default function CreateTransactionForm({ metadata }) {
 
   const handleClick = (event) => {
     event.preventDefault();
+
+    if (tx.sum < 0 || !tx.sum) {
+      Swal.fire({
+        title: "Ooops! The operation failed.",
+        text: "You can't fill in a negative number or leave it empty.",
+        icon: "warning",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
+      });
+      setTx({
+        name: "",
+        sum: "",
+        subtypeName: "",
+        typeName: metadata.type.name,
+      });
+      return;
+    }
     addTransaction(tx);
     setTx({
       name: "",
@@ -50,6 +68,7 @@ export default function CreateTransactionForm({ metadata }) {
       />
       <input
         onChange={handleChange}
+        type="number"
         name="sum"
         value={tx.sum}
         placeholder="Sum..."
