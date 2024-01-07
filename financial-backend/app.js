@@ -241,11 +241,12 @@ app.post("/", async (req, res) => {
       subtypeName: "Wishes Fund",
     });
 
-    wishesFundTransaction &&
+    if (wishesFundTransaction) {
       res
         .status(400)
         .json("This is a fund for wishes. Only one can exist at each time.");
-    return;
+      return;
+    }
   }
 
   const now = new Date();
