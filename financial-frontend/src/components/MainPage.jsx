@@ -180,7 +180,7 @@ export default function MainPage({
         <DatePicker
           className="DatePicker"
           selected={handleMonths.selectedDate}
-          onChange={handleMonths.handleChange2}
+          onChange={handleMonths.handleDataChange}
           dateFormat="MMMM yyyy"
           showMonthYearPicker
         />

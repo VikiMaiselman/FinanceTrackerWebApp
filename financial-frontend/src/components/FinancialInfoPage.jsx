@@ -13,20 +13,20 @@ import TransactionsContainer from "./TransactionsContainer";
 import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
 
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+// const months = [
+//   "January",
+//   "February",
+//   "March",
+//   "April",
+//   "May",
+//   "June",
+//   "July",
+//   "August",
+//   "September",
+//   "October",
+//   "November",
+//   "December",
+// ];
 
 const themeMonths = createTheme({
   palette: {
@@ -85,7 +85,6 @@ export default function FinancialInfoPage({
   return (
     <div className="AllTransactions">
       <h1 className="Header">
-        My {typeName}
         <Tooltip
           sx={{ minWidth: "max-content" }}
           title={
@@ -95,7 +94,7 @@ export default function FinancialInfoPage({
             </h3>
           }
         >
-          *
+          My {typeName}
         </Tooltip>
         : {totalSumThisMonth}₪{" "}
       </h1>
@@ -128,7 +127,7 @@ export default function FinancialInfoPage({
         <DatePicker
           className="DatePicker"
           selected={handleMonths.selectedDate}
-          onChange={handleMonths.handleChange2}
+          onChange={handleMonths.handleDataChange}
           dateFormat="MMMM yyyy"
           showMonthYearPicker
         />
