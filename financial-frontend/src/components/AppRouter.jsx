@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useStateWithCallbackLazy } from "use-state-with-callback";
 import { createTheme } from "@mui/material";
 import axios from "axios";
 
+import { AuthContext } from "../contexts/Auth.context";
 import Navbar from "./Navbar";
 import FinancialInfoPage from "./FinancialInfoPage";
 import MainPage from "./MainPage";
@@ -18,22 +18,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { addMonths } from "date-fns";
 
 import useFinanceState from "../hooks/useFinanceState";
-import { url, headers } from "../helpers";
-
-const theme = createTheme({
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 900,
-      lg: 1200,
-      xl: 1500,
-    },
-  },
-});
 
 export default function AppRouter() {
-  const [isAuthenticated, setIsAuthenticated] = useStateWithCallbackLazy(false);
+  // const [isAuthenticated, setIsAuthenticated] = useStateWithCallbackLazy(false);
+  const auth = React.useContext(AuthContext);
 
   const [
     financeState,
@@ -47,23 +35,6 @@ export default function AppRouter() {
     selectedDate,
     setSelectedDate,
   ] = useFinanceState();
-
-  useEffect(() => {
-    const getAuthStatus = async () => {
-      try {
-        const response = await axios.get(
-          `${url}/authstatus`,
-          { withCredentials: true },
-          headers
-        );
-        setIsAuthenticated(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    getAuthStatus();
-    fetchData();
-  }, [isAuthenticated]);
 
   const handleDataChange = (date) => {
     setSelectedDate(date);
@@ -107,7 +78,7 @@ export default function AppRouter() {
   });
 
   const toRender = financeState.generalStructure ? (
-    isAuthenticated ? (
+    auth.isAuthenticated ? (
       <div className="AllTransactions">
         <Navbar />
 
@@ -123,7 +94,6 @@ export default function AppRouter() {
                   dataForChart={data}
                   actions={actions}
                   handleMonths={handleMonths}
-                  theme={theme}
                 />
               }
             />
@@ -135,7 +105,6 @@ export default function AppRouter() {
                   dataForChart={data}
                   handleMonths={handleMonths}
                   typeName="Expenses"
-                  theme={theme}
                 />
               }
             />
@@ -146,7 +115,7 @@ export default function AppRouter() {
                   financeState={financeState}
                   handleMonths={handleMonths}
                   typeName="Incomes"
-                  theme={theme}
+  
                 />
               }
             />
@@ -157,7 +126,6 @@ export default function AppRouter() {
                   financeState={financeState}
                   handleMonths={handleMonths}
                   typeName="Savings"
-                  theme={theme}
                 />
               }
             />
@@ -167,10 +135,7 @@ export default function AppRouter() {
                 <Wishes fulfillWish={addTransaction} transferMoney={transfer} />
               }
             />
-            <Route
-              path="logout"
-              element={<Logout changeAuthStatus={setIsAuthenticated} />}
-            />
+            <Route path="logout" element={<Logout />} />
             <Route
               path="*"
               element={
@@ -186,7 +151,7 @@ export default function AppRouter() {
         </BrowserRouter>
       </div>
     ) : (
-      <Login changeAuthStatus={setIsAuthenticated} />
+      <Login />
     )
   ) : (
     <div className="AllTransactions">

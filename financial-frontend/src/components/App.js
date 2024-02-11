@@ -1,13 +1,24 @@
-import React from "react";
+import React, { memo } from "react";
+
 import "../styles/App.css";
+import AuthProvider from "../contexts/Auth.context";
+import CustomThemeProvider from "../contexts/CustomTheme.context";
 import AppRouter from "./AppRouter";
 
-function App() {
+export default memo(function App() {
+  return (
+    <CustomThemeProvider>
+      <AuthProvider>
+        <MainApp />
+      </AuthProvider>
+    </CustomThemeProvider>
+  );
+});
+
+function MainApp() {
   return (
     <div className="App">
       <AppRouter />
     </div>
   );
 }
-
-export default App;

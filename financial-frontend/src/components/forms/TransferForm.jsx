@@ -3,23 +3,14 @@ import SyncAltIcon from "@mui/icons-material/SyncAlt";
 import { Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../../styles/Form.css";
-
-const theme = createTheme({
-  palette: {
-    transfer: {
-      main: "#5f6f52",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
+import { CustomThemeContext } from "../../contexts/CustomTheme.context";
 
 export default function TransferForm({
   currentTransaction,
   transferAction,
   setShouldShowModal,
 }) {
+  const { theme } = React.useContext(CustomThemeContext);
   const [transfer, setTransfer] = useState({
     amountToTransfer: "",
   });

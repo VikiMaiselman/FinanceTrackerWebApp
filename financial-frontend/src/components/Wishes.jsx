@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { Button } from "@mui/material";
 import ReorderTwoToneIcon from "@mui/icons-material/ReorderTwoTone";
 import CustomCard from "./CustomCard";
 import Modal from "./Modal";
 import WishForm from "./forms/WishForm";
 import "../styles/Wishes.css";
+import { CustomThemeContext } from "../contexts/CustomTheme.context";
 
 const url = "http://localhost:3007/wishes";
 const headers = {
@@ -16,18 +17,9 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
-const theme = createTheme({
-  palette: {
-    transfer: {
-      main: "#5f6f52",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
 export default function Wishes({ fulfillWish, transferMoney }) {
+  const { theme } = React.useContext(CustomThemeContext);
+
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [wishes, setWishes] = useState([]);
 
@@ -53,7 +45,11 @@ export default function Wishes({ fulfillWish, transferMoney }) {
 
   const addWish = async (wish) => {
     wish.dueDate = new Date(wish.dueDate).toISOString();
-    if (!wish.imageURL || !wish.imageURL.startsWith("http://") || !wish.imageURL.startsWith("https://") ) {
+    if (
+      !wish.imageURL ||
+      !wish.imageURL.startsWith("http://") ||
+      !wish.imageURL.startsWith("https://")
+    ) {
       wish.imageURL =
         "https://cdn.pixabay.com/photo/2015/05/24/21/19/wish-782424_1280.jpg";
     }

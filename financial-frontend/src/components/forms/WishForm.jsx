@@ -4,17 +4,7 @@ import { Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Swal from "sweetalert2";
 import "../../styles/Form.css";
-
-const theme = createTheme({
-  palette: {
-    transfer: {
-      main: "#5f6f52",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
+import { CustomThemeContext } from "../../contexts/CustomTheme.context";
 
 export default function WishForm({
   action,
@@ -22,6 +12,7 @@ export default function WishForm({
   buttonText,
   wishData,
 }) {
+  const { theme } = React.useContext(CustomThemeContext);
   const [wishInfo, setWishInfo] = useState({
     wishName: wishData?.wish.name || "",
     wishDescription: wishData?.wish.description || "",

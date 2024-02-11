@@ -1,7 +1,6 @@
 import React from "react";
-
 import { Grid, Button, Tooltip } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import SwipeLeftIcon from "@mui/icons-material/SwipeLeft";
 import SwipeRightIcon from "@mui/icons-material/SwipeRight";
 
@@ -12,39 +11,15 @@ import { format } from "date-fns";
 import TransactionsContainer from "./TransactionsContainer";
 import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
-
-// const months = [
-//   "January",
-//   "February",
-//   "March",
-//   "April",
-//   "May",
-//   "June",
-//   "July",
-//   "August",
-//   "September",
-//   "October",
-//   "November",
-//   "December",
-// ];
-
-const themeMonths = createTheme({
-  palette: {
-    colors: {
-      main: "#483433",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
+import { CustomThemeContext } from "../contexts/CustomTheme.context";
 
 export default function FinancialInfoPage({
   financeState,
   handleMonths,
   typeName,
-  theme,
 }) {
+  const { theme } = React.useContext(CustomThemeContext);
+
   const type = financeState.generalStructure.types.find(
     (type) => type.name === typeName
   );
@@ -100,7 +75,7 @@ export default function FinancialInfoPage({
       </h1>
       <div>
         <div className="Main-month">
-          <ThemeProvider theme={themeMonths}>
+          <ThemeProvider theme={theme}>
             <Tooltip title="Previous month" placement="bottom">
               <Button
                 onClick={handleMonths.handlePrevMonth}
@@ -112,7 +87,7 @@ export default function FinancialInfoPage({
             </Tooltip>
           </ThemeProvider>
           <h1>in {format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
-          <ThemeProvider theme={themeMonths}>
+          <ThemeProvider theme={theme}>
             <Tooltip title="Next month" placement="bottom">
               <Button
                 onClick={handleMonths.handleNextMonth}

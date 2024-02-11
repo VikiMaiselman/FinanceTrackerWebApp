@@ -1,24 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-const url = "http://localhost:3007";
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "http://localhost:3000",
-};
+import { AuthContext } from "../contexts/Auth.context";
 
-export default function Logout({ changeAuthStatus }) {
+export default function Logout() {
+  const auth = useContext(AuthContext);
   const navigate = useNavigate();
+
   useEffect(() => {
     const logout = async () => {
-      await axios.get(`${url}/logout`, { withCredentials: true }, headers);
+      console.log("hi");
+      await auth.logout();
     };
     logout();
-    changeAuthStatus(false, () => {
-      console.log("i just called backend logout");
-      navigate("/", { replace: true });
-    });
+    navigate("/", { replace: true });
   }, []);
 
   return <></>;

@@ -1,19 +1,9 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import "../styles/Modal.css";
-
-const theme = createTheme({
-  palette: {
-    close: {
-      main: "#3f3f3f",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
+import { CustomThemeContext } from "../contexts/CustomTheme.context";
 
 export default function Modal({
   children,
@@ -21,6 +11,8 @@ export default function Modal({
   setShouldShowModal,
   isBig,
 }) {
+  const { theme } = React.useContext(CustomThemeContext);
+
   const showHideClassName = shouldShowModal
     ? "modal display-block"
     : "modal display-none";
@@ -32,7 +24,7 @@ export default function Modal({
         <ThemeProvider theme={theme}>
           <Button
             variant="contained"
-            color="close"
+            color="login"
             onClick={(event) => {
               event.preventDefault();
               setShouldShowModal(false);

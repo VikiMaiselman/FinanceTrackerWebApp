@@ -2,36 +2,18 @@ import React, { useState } from "react";
 import { FormHelperText, InputLabel, Button } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import "../../styles/Authentication.css";
+import { ThemeProvider } from "@mui/material/styles";
 
 import Swal from "sweetalert2";
-import axios from "axios";
 
-const url = "http://localhost:3007";
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "http://localhost:3000",
-};
+import "../../styles/Authentication.css";
+import { AuthContext } from "../../contexts/Auth.context";
+import { CustomThemeContext } from "../../contexts/CustomTheme.context";
 
-const theme = createTheme({
-  palette: {
-    login: {
-      main: "#3f3f3f",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-    register: {
-      main: "#5f6f52",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
+export default function Login() {
+  const auth = React.useContext(AuthContext);
+  const { theme } = React.useContext(CustomThemeContext);
 
-export default function Login({ changeAuthStatus }) {
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -56,25 +38,7 @@ export default function Login({ changeAuthStatus }) {
       });
       return;
     }
-    try {
-      const response = await axios.post(
-        `${url}/login`,
-        user,
-        { withCredentials: true },
-        headers
-      );
-
-      if (response.status === 200) {
-        changeAuthStatus(true);
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Ooops!",
-        text: "This user does not exist. Are you sure you don't need to sign up?",
-        icon: "error",
-      });
-    }
+    await auth.login(user);
   };
 
   const handleRegisterClick = async (event) => {
@@ -88,26 +52,7 @@ export default function Login({ changeAuthStatus }) {
       return;
     }
 
-    let response;
-    try {
-      response = await axios.post(
-        `${url}/register`,
-        user,
-        { withCredentials: true },
-        headers
-      );
-
-      if (response.status === 200) {
-        changeAuthStatus(true);
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Ooops!",
-        text: error.response.data.message,
-        icon: "error",
-      });
-    }
+    await auth.register(user);
   };
 
   return (

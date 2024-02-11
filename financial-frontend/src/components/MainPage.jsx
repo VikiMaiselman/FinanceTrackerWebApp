@@ -17,6 +17,7 @@ import "../styles/AllTransactions.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
+import { CustomThemeContext } from "../contexts/CustomTheme.context";
 
 const url = "http://localhost:3007";
 const headers = {
@@ -40,9 +41,10 @@ export default function MainPage({
   dataForChart,
   actions,
   handleMonths,
-  theme,
   updatePage,
 }) {
+  const { theme } = React.useContext(CustomThemeContext);
+
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [transactionOfTransfer, setTransactionDealtWith] = useState({});
 
@@ -153,7 +155,7 @@ export default function MainPage({
       <div>
         <h1 style={{ fontWeight: "lighter" }}>My transactions as of: </h1>
         <div className="Main-month">
-          <ThemeProvider theme={themeMonths}>
+          <ThemeProvider theme={theme}>
             <Tooltip title="Previous month" placement="bottom">
               <Button
                 onClick={handleMonths.handlePrevMonth}
@@ -165,7 +167,7 @@ export default function MainPage({
             </Tooltip>
           </ThemeProvider>
           <h1>{format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
-          <ThemeProvider theme={themeMonths}>
+          <ThemeProvider theme={theme}>
             <Tooltip title="Next month" placement="bottom">
               <Button
                 onClick={handleMonths.handleNextMonth}
