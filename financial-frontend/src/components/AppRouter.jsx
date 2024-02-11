@@ -1,7 +1,5 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { createTheme } from "@mui/material";
-import axios from "axios";
 
 import { AuthContext } from "../contexts/Auth.context";
 import Navbar from "./Navbar";
@@ -20,21 +18,18 @@ import { addMonths } from "date-fns";
 import useFinanceState from "../hooks/useFinanceState";
 
 export default function AppRouter() {
-  // const [isAuthenticated, setIsAuthenticated] = useStateWithCallbackLazy(false);
   const auth = React.useContext(AuthContext);
 
-  const [
+  const {
     financeState,
     fetchData,
     addTransaction,
-    updateTransaction,
-    removeTransaction,
-    transfer,
     error,
-    errorHandler,
     selectedDate,
     setSelectedDate,
-  ] = useFinanceState();
+  } = useFinanceState();
+
+  console.log("reloading");
 
   const handleDataChange = (date) => {
     setSelectedDate(date);
@@ -46,9 +41,9 @@ export default function AppRouter() {
     setSelectedDate(addMonths(selectedDate, 1));
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [selectedDate, financeState]);
 
   const handleMonths = {
     handlePrevMonth: handlePrevMonth,
@@ -56,13 +51,6 @@ export default function AppRouter() {
     handleDataChange: handleDataChange,
     setSelectedDate: setSelectedDate,
     selectedDate: selectedDate,
-  };
-
-  const actions = {
-    addTransaction: addTransaction,
-    updateTransaction: updateTransaction,
-    removeTransaction: removeTransaction,
-    transfer: transfer,
   };
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
@@ -92,7 +80,7 @@ export default function AppRouter() {
                   financeState={financeState}
                   updatePage={fetchData}
                   dataForChart={data}
-                  actions={actions}
+                  // actions={actions}
                   handleMonths={handleMonths}
                 />
               }
@@ -115,7 +103,6 @@ export default function AppRouter() {
                   financeState={financeState}
                   handleMonths={handleMonths}
                   typeName="Incomes"
-  
                 />
               }
             />
@@ -131,9 +118,7 @@ export default function AppRouter() {
             />
             <Route
               path="wishes"
-              element={
-                <Wishes fulfillWish={addTransaction} transferMoney={transfer} />
-              }
+              element={<Wishes fulfillWish={addTransaction} />}
             />
             <Route path="logout" element={<Logout />} />
             <Route

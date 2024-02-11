@@ -10,6 +10,7 @@ import Modal from "./Modal";
 import WishForm from "./forms/WishForm";
 import "../styles/Wishes.css";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
+import useFinanceState from "../hooks/useFinanceState";
 
 const url = "http://localhost:3007/wishes";
 const headers = {
@@ -17,8 +18,10 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
-export default function Wishes({ fulfillWish, transferMoney }) {
+export default function Wishes() {
   const { theme } = React.useContext(CustomThemeContext);
+
+  const {addTransaction, transfer } = useFinanceState();
 
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [wishes, setWishes] = useState([]);
@@ -194,8 +197,8 @@ export default function Wishes({ fulfillWish, transferMoney }) {
               updateCurSum={updateCurSum}
               deleteWish={deleteWish}
               updateWish={updateWish}
-              fulfillWish={fulfillWish}
-              transferMoney={transferMoney}
+              fulfillWish={addTransaction}
+              transferMoney={transfer}
             />
           );
         })}

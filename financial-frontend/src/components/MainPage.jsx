@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Grid, Button, Tooltip } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import SwipeLeftIcon from "@mui/icons-material/SwipeLeft";
 import SwipeRightIcon from "@mui/icons-material/SwipeRight";
 
@@ -25,21 +25,9 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
-const themeMonths = createTheme({
-  palette: {
-    colors: {
-      main: "#5f6f52",
-      light: "#E9DB5D",
-      dark: "#A29415",
-      contrastText: "#ffffff",
-    },
-  },
-});
-
 export default function MainPage({
   financeState,
   dataForChart,
-  actions,
   handleMonths,
   updatePage,
 }) {
@@ -213,7 +201,6 @@ export default function MainPage({
                 isFullVersion={true}
                 transactionsToDisplay={transactionsOfThisType}
                 type={type}
-                actions={actions}
                 setShouldShowModal={setShouldShowModal}
                 setTransactionDealtWith={setTransactionDealtWith}
               />
@@ -245,7 +232,6 @@ export default function MainPage({
           saving." W.Baffet
         </p>
         <TransferForm
-          transferAction={actions.transfer}
           currentTransaction={transactionOfTransfer}
           setShouldShowModal={setShouldShowModal}
         />

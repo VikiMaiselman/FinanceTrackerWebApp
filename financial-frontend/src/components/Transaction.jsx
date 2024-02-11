@@ -6,6 +6,7 @@ import UpdateTransactionForm from "./forms/UpdateTransactionForm";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
 import "../styles/Transaction.css";
+import useFinanceState from "../hooks/useFinanceState";
 
 export default function Transaction({
   isFullVersion,
@@ -14,8 +15,8 @@ export default function Transaction({
   setShouldShowModal,
   setTransactionDealtWith,
 }) {
+  const { removeTransaction } = useFinanceState();
   const { name, sum, date, subtypeName } = txData;
-  const removeTransaction = metadata?.actions?.removeTransaction;
 
   const [isEditable, setIsEditable] = useState(false);
 

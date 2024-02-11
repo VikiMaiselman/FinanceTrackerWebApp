@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -15,7 +15,7 @@ export default function useFinanceState() {
     message: "",
   });
 
-  const getFinanceState = async () => {
+  const fetchData = async () => {
     try {
       const response = await axios.get(url, { withCredentials: true }, headers);
       const finance = response.data;
@@ -25,14 +25,13 @@ export default function useFinanceState() {
         selectedDate
       );
 
-      const updateFinanceState = (prevState) => {
+      setFinanceState((prevState) => {
         return {
           ...prevState,
           allTransactions: transactionsOfThisMonth,
           generalStructure: finance.generalStructure,
         };
-      };
-      setFinanceState(updateFinanceState);
+      });
     } catch (error) {
       console.error(error);
       errorHandler({
@@ -42,13 +41,14 @@ export default function useFinanceState() {
     }
   };
 
-  async function fetchData() {
-    await getFinanceState();
-  }
+  useEffect(() => {
+    fetchData();
+  }, [selectedDate, financeState]); // todo: constant reloading :(
 
   const addTransaction = async (newTransaction) => {
     try {
       await axios.post(url, newTransaction, { withCredentials: true }, headers);
+      await fetchData();
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -59,8 +59,6 @@ export default function useFinanceState() {
         iconColor: "rgb(154, 68, 68)",
       });
     }
-
-    fetchData();
   };
 
   const updateTransaction = async (transaction) => {
@@ -75,6 +73,7 @@ export default function useFinanceState() {
         { withCredentials: true },
         headers
       );
+      await fetchData();
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -86,7 +85,7 @@ export default function useFinanceState() {
       });
     }
 
-    fetchData();
+    // getFinanceState();
   };
 
   const removeTransaction = async (transaction) => {
@@ -100,6 +99,7 @@ export default function useFinanceState() {
         { withCredentials: true },
         headers
       );
+      await fetchData();
     } catch (error) {
       console.error(error);
       Swal.fire({
@@ -110,7 +110,6 @@ export default function useFinanceState() {
         iconColor: "rgb(154, 68, 68)",
       });
     }
-    fetchData();
   };
 
   const transfer = async (
@@ -188,7 +187,7 @@ export default function useFinanceState() {
     }
   };
 
-  return [
+  return {
     financeState,
     fetchData,
     addTransaction,
@@ -199,5 +198,5 @@ export default function useFinanceState() {
     errorHandler,
     selectedDate,
     setSelectedDate,
-  ];
+  };
 }

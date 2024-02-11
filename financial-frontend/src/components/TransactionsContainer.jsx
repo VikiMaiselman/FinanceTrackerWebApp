@@ -7,12 +7,10 @@ export default function TransactionsContainer({
   isFullVersion,
   transactionsToDisplay,
   type,
-  actions,
   setShouldShowModal,
   setTransactionDealtWith
 }) {
   const metadataForNewTransaction = {
-    actions: actions,
     type: type,
   };
 

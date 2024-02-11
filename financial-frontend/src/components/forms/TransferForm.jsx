@@ -4,13 +4,15 @@ import { Button } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "../../styles/Form.css";
 import { CustomThemeContext } from "../../contexts/CustomTheme.context";
+import useFinanceState from "../../hooks/useFinanceState";
 
 export default function TransferForm({
   currentTransaction,
-  transferAction,
   setShouldShowModal,
 }) {
   const { theme } = React.useContext(CustomThemeContext);
+  const {transfer : transferAction} = useFinanceState();
+
   const [transfer, setTransfer] = useState({
     amountToTransfer: "",
   });
