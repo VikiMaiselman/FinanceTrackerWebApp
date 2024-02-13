@@ -3,7 +3,8 @@ import Swal from "sweetalert2";
 import { Tooltip } from "@mui/material";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import "../../styles/Form.css";
-import useFinanceState from "../../hooks/useFinanceState";
+
+import { FinanceContext } from "../../contexts/Finance.context";
 
 export default function CreateTransactionForm({ metadata }) {
   const [tx, setTx] = useState({
@@ -13,7 +14,7 @@ export default function CreateTransactionForm({ metadata }) {
     typeName: metadata.type.name,
   });
 
-  const { addTransaction } = useFinanceState();
+  const { addTransaction } = React.useContext(FinanceContext);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

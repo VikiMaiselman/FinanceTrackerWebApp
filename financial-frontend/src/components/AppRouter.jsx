@@ -14,18 +14,27 @@ import "../styles/NavigationBar.css";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-import useFinanceState from "../hooks/useFinanceState";
+import { FinanceContext } from "../contexts/Finance.context";
 
 export default function AppRouter() {
   const auth = React.useContext(AuthContext);
 
-  const { financeState, fetchData, addTransaction, error } = useFinanceState();
+  //  financeState,
+  // fetchData,
+  // addTransaction,
+  // updateTransaction,
+  // removeTransaction,
+  // transfer,
+  // error,
+  // errorHandler,
+  const { financeState, fetchData, addTransaction, error } =
+    React.useContext(FinanceContext);
 
-  // console.log("reloading", financeState);
+  console.log("got new finance state", financeState);
 
   // useEffect(() => {
   //   fetchData();
-  // }, [selectedDate, financeState]);
+  // }, [financeState]);
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
   const data = financeState.generalStructure?.types?.map((type, idx) => {
@@ -51,7 +60,7 @@ export default function AppRouter() {
               index
               element={
                 <MainPage
-                  financeState={financeState}
+                  // financeState={financeState}
                   updatePage={fetchData}
                   dataForChart={data}
                   // actions={actions}

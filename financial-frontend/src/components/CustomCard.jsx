@@ -17,6 +17,7 @@ import AddTaskIcon from "@mui/icons-material/AddTask";
 import Modal from "./Modal";
 import WishForm from "./forms/WishForm";
 import "../styles/Wishes.css";
+import { FinanceContext } from "../contexts/Finance.context";
 
 const url = "http://localhost:3007/transaction";
 const headers = {
@@ -30,7 +31,6 @@ export default function CustomCard({
   updateCurSum,
   deleteWish,
   updateWish,
-  fulfillWish,
   transferMoney,
 }) {
   const [shouldShowModal, setShouldShowModal] = useState(false);
@@ -39,6 +39,8 @@ export default function CustomCard({
   const [currentSumToDisplay, setCurrentSumToDisplay] = useState(
     wish.currentSum
   );
+
+  const { addTransaction: fulfillWish } = React.useContext(FinanceContext);
 
   const handleChangeSum = (event) => {
     const { value } = event.target;

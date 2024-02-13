@@ -6,7 +6,7 @@ import UpdateTransactionForm from "./forms/UpdateTransactionForm";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 
 import "../styles/Transaction.css";
-import useFinanceState from "../hooks/useFinanceState";
+import { FinanceContext } from "../contexts/Finance.context";
 
 export default function Transaction({
   isFullVersion,
@@ -15,7 +15,7 @@ export default function Transaction({
   setShouldShowModal,
   setTransactionDealtWith,
 }) {
-  const { removeTransaction } = useFinanceState();
+  const { removeTransaction } = React.useContext(FinanceContext);
   const { name, sum, date, subtypeName } = txData;
 
   const [isEditable, setIsEditable] = useState(false);

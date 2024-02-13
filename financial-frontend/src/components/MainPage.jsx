@@ -19,6 +19,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
 import { MonthContext } from "../contexts/Month.context";
+import useFinanceState from "../hooks/useFinanceState";
+import { FinanceContext } from "../contexts/Finance.context";
 
 const url = "http://localhost:3007";
 const headers = {
@@ -26,7 +28,7 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
-export default function MainPage({ financeState, dataForChart, updatePage }) {
+export default function MainPage({ dataForChart, updatePage }) {
   const { theme } = React.useContext(CustomThemeContext);
   const { selectedDate, handleDataChange, handlePrevMonth, handleNextMonth } =
     React.useContext(MonthContext);
@@ -34,7 +36,8 @@ export default function MainPage({ financeState, dataForChart, updatePage }) {
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [transactionOfTransfer, setTransactionDealtWith] = useState({});
 
-  // console.log(selectedDate);
+  const { financeState } = React.useContext(FinanceContext);
+
   const addSubtype = async (newSubtype) => {
     if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
       Swal.fire({
@@ -130,111 +133,113 @@ export default function MainPage({ financeState, dataForChart, updatePage }) {
   };
 
   return (
-    <div className="AllTransactions">
-      <h1 className="Header">
-        My Total Financial State: {financeState.generalStructure.total}₪
-      </h1>
+    financeState && (
+      <div className="AllTransactions">
+        <h1 className="Header">
+          My Total Financial State: {financeState.generalStructure.total}₪
+        </h1>
 
-      {financeState.generalStructure.total !== 0 && (
-        <CustomBarChart data={dataForChart} />
-      )}
+        {financeState.generalStructure.total !== 0 && (
+          <CustomBarChart data={dataForChart} />
+        )}
 
-      <div>
-        <h1 style={{ fontWeight: "lighter" }}>My transactions as of: </h1>
-        <div className="Main-month">
-          <ThemeProvider theme={theme}>
-            <Tooltip title="Previous month" placement="bottom">
-              <Button
-                onClick={handlePrevMonth}
-                color="colors"
-                sx={{ marginTop: "2.5%" }}
-              >
-                <SwipeLeftIcon />
-              </Button>
-            </Tooltip>
-          </ThemeProvider>
-          <h1>{format(selectedDate, "MMMM yyyy")} </h1>
-          <ThemeProvider theme={theme}>
-            <Tooltip title="Next month" placement="bottom">
-              <Button
-                onClick={handleNextMonth}
-                color="colors"
-                sx={{ marginTop: "2.5%" }}
-              >
-                <SwipeRightIcon />
-              </Button>
-            </Tooltip>
-          </ThemeProvider>
-        </div>
-        <DatePicker
-          className="DatePicker"
-          selected={selectedDate}
-          onChange={handleDataChange}
-          dateFormat="MMMM yyyy"
-          showMonthYearPicker
-        />
-      </div>
-
-      {/* Transactions themselves:  */}
-      <Grid
-        container
-        className="AllTransactions-contents"
-        spacing={8}
-        sx={{ marginTop: "-112px" }}
-      >
-        {financeState.generalStructure.types.map((type) => {
-          const transactionsOfThisType = financeState.allTransactions.filter(
-            (tx) => tx.typeName === type.name
-          );
-          return (
-            <Grid
-              className="AllTransaction-content"
-              item
-              theme={theme}
-              lg={12}
-              xl={4}
-              key={type._id}
-            >
-              <TransactionsContainer
-                key={type._id}
-                isFullVersion={true}
-                transactionsToDisplay={transactionsOfThisType}
-                type={type}
-                setShouldShowModal={setShouldShowModal}
-                setTransactionDealtWith={setTransactionDealtWith}
-              />
-            </Grid>
-          );
-        })}
-      </Grid>
-
-      <div>
-        <h2 className="ManageSubtypes-h2">
-          Here you can manage your subcategories for a better finance analytics
-          and planification:
-        </h2>
-        <div className="ManageSubtypes">
-          <CreateSubtypeForm actions={actionsWithCats} />
-          <RemoveSubtypeForm
-            types={financeState.generalStructure.types}
-            actions={actionsWithCats}
+        <div>
+          <h1 style={{ fontWeight: "lighter" }}>My transactions as of: </h1>
+          <div className="Main-month">
+            <ThemeProvider theme={theme}>
+              <Tooltip title="Previous month" placement="bottom">
+                <Button
+                  onClick={handlePrevMonth}
+                  color="colors"
+                  sx={{ marginTop: "2.5%" }}
+                >
+                  <SwipeLeftIcon />
+                </Button>
+              </Tooltip>
+            </ThemeProvider>
+            <h1>{format(selectedDate, "MMMM yyyy")} </h1>
+            <ThemeProvider theme={theme}>
+              <Tooltip title="Next month" placement="bottom">
+                <Button
+                  onClick={handleNextMonth}
+                  color="colors"
+                  sx={{ marginTop: "2.5%" }}
+                >
+                  <SwipeRightIcon />
+                </Button>
+              </Tooltip>
+            </ThemeProvider>
+          </div>
+          <DatePicker
+            className="DatePicker"
+            selected={selectedDate}
+            onChange={handleDataChange}
+            dateFormat="MMMM yyyy"
+            showMonthYearPicker
           />
         </div>
-      </div>
-      <Modal
-        shouldShowModal={shouldShowModal}
-        setShouldShowModal={setShouldShowModal}
-      >
-        <h2>You can transfer some money to your savings</h2>
-        <p>
-          "Do not save what is left after spending, but spend what is left after
-          saving." W.Baffet
-        </p>
-        <TransferForm
-          currentTransaction={transactionOfTransfer}
+
+        {/* Transactions themselves:  */}
+        <Grid
+          container
+          className="AllTransactions-contents"
+          spacing={8}
+          sx={{ marginTop: "-112px" }}
+        >
+          {financeState?.generalStructure?.types?.map((type) => {
+            const transactionsOfThisType = financeState.allTransactions.filter(
+              (tx) => tx.typeName === type.name
+            );
+            return (
+              <Grid
+                className="AllTransaction-content"
+                item
+                theme={theme}
+                lg={12}
+                xl={4}
+                key={type._id}
+              >
+                <TransactionsContainer
+                  key={type._id}
+                  isFullVersion={true}
+                  transactionsToDisplay={transactionsOfThisType}
+                  type={type}
+                  setShouldShowModal={setShouldShowModal}
+                  setTransactionDealtWith={setTransactionDealtWith}
+                />
+              </Grid>
+            );
+          })}
+        </Grid>
+
+        <div>
+          <h2 className="ManageSubtypes-h2">
+            Here you can manage your subcategories for a better finance
+            analytics and planification:
+          </h2>
+          <div className="ManageSubtypes">
+            <CreateSubtypeForm actions={actionsWithCats} />
+            <RemoveSubtypeForm
+              types={financeState.generalStructure.types}
+              actions={actionsWithCats}
+            />
+          </div>
+        </div>
+        <Modal
+          shouldShowModal={shouldShowModal}
           setShouldShowModal={setShouldShowModal}
-        />
-      </Modal>
-    </div>
+        >
+          <h2>You can transfer some money to your savings</h2>
+          <p>
+            "Do not save what is left after spending, but spend what is left
+            after saving." W.Baffet
+          </p>
+          <TransferForm
+            currentTransaction={transactionOfTransfer}
+            setShouldShowModal={setShouldShowModal}
+          />
+        </Modal>
+      </div>
+    )
   );
 }

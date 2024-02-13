@@ -4,6 +4,7 @@ import "../styles/App.css";
 import AuthProvider from "../contexts/Auth.context";
 import CustomThemeProvider from "../contexts/CustomTheme.context";
 import MonthProvider from "../contexts/Month.context";
+import FinanceProvider from "../contexts/Finance.context";
 import AppRouter from "./AppRouter";
 
 export default memo(function App() {
@@ -11,7 +12,9 @@ export default memo(function App() {
     <CustomThemeProvider>
       <AuthProvider>
         <MonthProvider>
-          <MainApp />
+          <FinanceProvider>
+            <MainApp />
+          </FinanceProvider>
         </MonthProvider>
       </AuthProvider>
     </CustomThemeProvider>

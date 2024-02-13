@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import DoneSharpIcon from "@mui/icons-material/DoneSharp";
 import "../../styles/Form.css";
+import { FinanceContext } from "../../contexts/Finance.context";
 
 export default function UpdateTransactionForm({
   txData,
@@ -15,7 +16,7 @@ export default function UpdateTransactionForm({
     typeName: metadata.type.name,
   });
 
-  const { updateTransaction } = metadata.actions;
+  const { updateTransaction } = React.useContext(FinanceContext);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

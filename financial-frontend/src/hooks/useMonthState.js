@@ -5,7 +5,6 @@ import { addMonths } from "date-fns";
 import { getCurrentDate } from "../helpers";
 
 export default function useMonthState() {
-  console.log("inititalized");
   const [selectedDate, setSelectedDate] = React.useState(() =>
     getCurrentDate()
   );

@@ -27,8 +27,6 @@ export default function useFinanceState() {
         selectedDate
       );
 
-      console.log("trans of this mont", transactionsOfThisMonth, selectedDate);
-
       setFinanceState((prevState) => {
         return {
           ...prevState,
@@ -47,8 +45,7 @@ export default function useFinanceState() {
 
   useEffect(() => {
     (async () => await fetchData())();
-    // console.log(selectedDate);
-  }, [selectedDate]); // todo: constant reloading :(
+  }, [selectedDate]);
 
   const addTransaction = async (newTransaction) => {
     try {
@@ -192,7 +189,7 @@ export default function useFinanceState() {
     }
   };
 
-  return {
+  return [
     financeState,
     fetchData,
     addTransaction,
@@ -201,5 +198,5 @@ export default function useFinanceState() {
     transfer,
     error,
     errorHandler,
-  };
+  ];
 }

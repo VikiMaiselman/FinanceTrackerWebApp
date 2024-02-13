@@ -21,7 +21,7 @@ const headers = {
 export default function Wishes() {
   const { theme } = React.useContext(CustomThemeContext);
 
-  const {addTransaction, transfer } = useFinanceState();
+  const { transfer } = useFinanceState();
 
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [wishes, setWishes] = useState([]);
@@ -197,7 +197,6 @@ export default function Wishes() {
               updateCurSum={updateCurSum}
               deleteWish={deleteWish}
               updateWish={updateWish}
-              fulfillWish={addTransaction}
               transferMoney={transfer}
             />
           );
