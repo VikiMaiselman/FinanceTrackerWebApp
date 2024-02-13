@@ -12,13 +12,13 @@ import TransactionsContainer from "./TransactionsContainer";
 import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
+import { MonthContext } from "../contexts/Month.context";
 
-export default function FinancialInfoPage({
-  financeState,
-  handleMonths,
-  typeName,
-}) {
+export default function FinancialInfoPage({ financeState, typeName }) {
   const { theme } = React.useContext(CustomThemeContext);
+
+  const { selectedDate, handleDataChange, handlePrevMonth, handleNextMonth } =
+    React.useContext(MonthContext);
 
   const type = financeState.generalStructure.types.find(
     (type) => type.name === typeName
@@ -78,7 +78,7 @@ export default function FinancialInfoPage({
           <ThemeProvider theme={theme}>
             <Tooltip title="Previous month" placement="bottom">
               <Button
-                onClick={handleMonths.handlePrevMonth}
+                onClick={handlePrevMonth}
                 color="colors"
                 sx={{ marginTop: "2.5%" }}
               >
@@ -86,11 +86,11 @@ export default function FinancialInfoPage({
               </Button>
             </Tooltip>
           </ThemeProvider>
-          <h1>in {format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
+          <h1>in {format(selectedDate, "MMMM yyyy")} </h1>
           <ThemeProvider theme={theme}>
             <Tooltip title="Next month" placement="bottom">
               <Button
-                onClick={handleMonths.handleNextMonth}
+                onClick={handleNextMonth}
                 color="colors"
                 sx={{ marginTop: "2.5%" }}
               >
@@ -101,8 +101,8 @@ export default function FinancialInfoPage({
         </div>
         <DatePicker
           className="DatePicker"
-          selected={handleMonths.selectedDate}
-          onChange={handleMonths.handleDataChange}
+          selected={selectedDate}
+          onChange={handleDataChange}
           dateFormat="MMMM yyyy"
           showMonthYearPicker
         />

@@ -18,6 +18,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
+import { MonthContext } from "../contexts/Month.context";
 
 const url = "http://localhost:3007";
 const headers = {
@@ -25,17 +26,15 @@ const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
-export default function MainPage({
-  financeState,
-  dataForChart,
-  handleMonths,
-  updatePage,
-}) {
+export default function MainPage({ financeState, dataForChart, updatePage }) {
   const { theme } = React.useContext(CustomThemeContext);
+  const { selectedDate, handleDataChange, handlePrevMonth, handleNextMonth } =
+    React.useContext(MonthContext);
 
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [transactionOfTransfer, setTransactionDealtWith] = useState({});
 
+  // console.log(selectedDate);
   const addSubtype = async (newSubtype) => {
     if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
       Swal.fire({
@@ -146,7 +145,7 @@ export default function MainPage({
           <ThemeProvider theme={theme}>
             <Tooltip title="Previous month" placement="bottom">
               <Button
-                onClick={handleMonths.handlePrevMonth}
+                onClick={handlePrevMonth}
                 color="colors"
                 sx={{ marginTop: "2.5%" }}
               >
@@ -154,11 +153,11 @@ export default function MainPage({
               </Button>
             </Tooltip>
           </ThemeProvider>
-          <h1>{format(handleMonths.selectedDate, "MMMM yyyy")} </h1>
+          <h1>{format(selectedDate, "MMMM yyyy")} </h1>
           <ThemeProvider theme={theme}>
             <Tooltip title="Next month" placement="bottom">
               <Button
-                onClick={handleMonths.handleNextMonth}
+                onClick={handleNextMonth}
                 color="colors"
                 sx={{ marginTop: "2.5%" }}
               >
@@ -169,8 +168,8 @@ export default function MainPage({
         </div>
         <DatePicker
           className="DatePicker"
-          selected={handleMonths.selectedDate}
-          onChange={handleMonths.handleDataChange}
+          selected={selectedDate}
+          onChange={handleDataChange}
           dateFormat="MMMM yyyy"
           showMonthYearPicker
         />

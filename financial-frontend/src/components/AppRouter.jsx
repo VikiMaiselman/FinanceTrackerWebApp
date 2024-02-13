@@ -13,45 +13,19 @@ import "../styles/AllTransactions.css";
 import "../styles/NavigationBar.css";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { addMonths } from "date-fns";
 
 import useFinanceState from "../hooks/useFinanceState";
 
 export default function AppRouter() {
   const auth = React.useContext(AuthContext);
 
-  const {
-    financeState,
-    fetchData,
-    addTransaction,
-    error,
-    selectedDate,
-    setSelectedDate,
-  } = useFinanceState();
+  const { financeState, fetchData, addTransaction, error } = useFinanceState();
 
-  console.log("reloading");
-
-  const handleDataChange = (date) => {
-    setSelectedDate(date);
-  };
-  const handlePrevMonth = async () => {
-    setSelectedDate(addMonths(selectedDate, -1));
-  };
-  const handleNextMonth = () => {
-    setSelectedDate(addMonths(selectedDate, 1));
-  };
+  // console.log("reloading", financeState);
 
   // useEffect(() => {
   //   fetchData();
   // }, [selectedDate, financeState]);
-
-  const handleMonths = {
-    handlePrevMonth: handlePrevMonth,
-    handleNextMonth: handleNextMonth,
-    handleDataChange: handleDataChange,
-    setSelectedDate: setSelectedDate,
-    selectedDate: selectedDate,
-  };
 
   const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
   const data = financeState.generalStructure?.types?.map((type, idx) => {
@@ -81,7 +55,6 @@ export default function AppRouter() {
                   updatePage={fetchData}
                   dataForChart={data}
                   // actions={actions}
-                  handleMonths={handleMonths}
                 />
               }
             />
@@ -91,7 +64,6 @@ export default function AppRouter() {
                 <FinancialInfoPage
                   financeState={financeState}
                   dataForChart={data}
-                  handleMonths={handleMonths}
                   typeName="Expenses"
                 />
               }
@@ -101,7 +73,6 @@ export default function AppRouter() {
               element={
                 <FinancialInfoPage
                   financeState={financeState}
-                  handleMonths={handleMonths}
                   typeName="Incomes"
                 />
               }
@@ -111,7 +82,6 @@ export default function AppRouter() {
               element={
                 <FinancialInfoPage
                   financeState={financeState}
-                  handleMonths={handleMonths}
                   typeName="Savings"
                 />
               }

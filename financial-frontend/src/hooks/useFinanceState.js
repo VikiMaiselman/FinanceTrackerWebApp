@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 import { url, headers, findTransactionsOfAMonth } from "../helpers";
+import { MonthContext } from "../contexts/Month.context";
 
 export default function useFinanceState() {
   const [financeState, setFinanceState] = useState({
     allTransactions: "",
     generalStructure: "",
   });
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [error, errorHandler] = useState({
     isError: false,
     message: "",
   });
+
+  const { selectedDate } = useContext(MonthContext);
 
   const fetchData = async () => {
     try {
@@ -24,6 +26,8 @@ export default function useFinanceState() {
         finance,
         selectedDate
       );
+
+      console.log("trans of this mont", transactionsOfThisMonth, selectedDate);
 
       setFinanceState((prevState) => {
         return {
@@ -42,8 +46,9 @@ export default function useFinanceState() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [selectedDate, financeState]); // todo: constant reloading :(
+    (async () => await fetchData())();
+    // console.log(selectedDate);
+  }, [selectedDate]); // todo: constant reloading :(
 
   const addTransaction = async (newTransaction) => {
     try {
@@ -196,7 +201,5 @@ export default function useFinanceState() {
     transfer,
     error,
     errorHandler,
-    selectedDate,
-    setSelectedDate,
   };
 }

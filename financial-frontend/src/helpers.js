@@ -4,14 +4,24 @@ export const headers = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
 };
 
+let currDate = new Date();
+
+export function getCurrentDate() {
+  return currDate;
+}
+
+export function setCurrentDate(date) {
+  currDate = date;
+}
+
 export function findTransactionsOfAMonth(finance, selectedDate) {
-    return finance.allTransactions.filter((tx) => {
-        const monthOfTx = new Date(tx.dateForDB).getMonth();
-        const yearOfTx = new Date(tx.dateForDB).getFullYear();
+  return finance.allTransactions.filter((tx) => {
+    const monthOfTx = new Date(tx.dateForDB).getMonth();
+    const yearOfTx = new Date(tx.dateForDB).getFullYear();
 
-        const targetMonth = selectedDate.getMonth();
-        const targetYear = selectedDate.getFullYear();
+    const targetMonth = selectedDate.getMonth();
+    const targetYear = selectedDate.getFullYear();
 
-        return monthOfTx === targetMonth && yearOfTx === targetYear;
-      });
+    return monthOfTx === targetMonth && yearOfTx === targetYear;
+  });
 }
