@@ -13,12 +13,15 @@ import CustomPieChart from "./CustomPieChart";
 import "../styles/ManageSubtypes.css";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
 import { MonthContext } from "../contexts/Month.context";
+import { FinanceContext } from "../contexts/Finance.context";
 
-export default function FinancialInfoPage({ financeState, typeName }) {
+export default function FinancialInfoPage({ typeName }) {
   const { theme } = React.useContext(CustomThemeContext);
 
   const { selectedDate, handleDataChange, handlePrevMonth, handleNextMonth } =
     React.useContext(MonthContext);
+
+  const { financeState } = React.useContext(FinanceContext);
 
   const type = financeState.generalStructure.types.find(
     (type) => type.name === typeName
@@ -132,7 +135,6 @@ export default function FinancialInfoPage({ financeState, typeName }) {
                   key={subtype._id}
                   isFullVersion={false}
                   transactionsToDisplay={transactionsOfThisSubtype}
-                  globalId={financeState.generalStructure._id}
                   type={subtype}
                 />
               </Grid>

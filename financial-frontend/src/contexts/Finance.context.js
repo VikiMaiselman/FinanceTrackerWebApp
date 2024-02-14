@@ -11,9 +11,13 @@ export default function FinanceProvider({ children }) {
     updateTransaction,
     removeTransaction,
     transfer,
+    addSubtype,
+    removeSubtype,
     error,
     errorHandler,
   ] = useFinanceState();
+
+  console.log("FinanceContext called");
 
   return (
     <FinanceContext.Provider
@@ -24,6 +28,8 @@ export default function FinanceProvider({ children }) {
         updateTransaction,
         removeTransaction,
         transfer,
+        addSubtype,
+        removeSubtype,
         error,
         errorHandler,
       }}

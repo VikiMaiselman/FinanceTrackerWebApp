@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import SyncAltIcon from "@mui/icons-material/SyncAlt";
 import { Button } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import "../../styles/Form.css";
 import { CustomThemeContext } from "../../contexts/CustomTheme.context";
 import useFinanceState from "../../hooks/useFinanceState";
 
 export default function TransferForm({
-  currentTransaction,
+  transferTx,
   setShouldShowModal,
 }) {
   const { theme } = React.useContext(CustomThemeContext);
@@ -29,7 +29,7 @@ export default function TransferForm({
 
   const handleClick = (event) => {
     event.preventDefault();
-    transferAction(currentTransaction, transfer.amountToTransfer);
+    transferAction(transferTx, transfer.amountToTransfer);
     setShouldShowModal(false);
     setTransfer({
       amountToTransfer: "",
@@ -42,7 +42,7 @@ export default function TransferForm({
         onChange={handleChange}
         name="amountToTransfer"
         value={transfer.amountToTransfer}
-        placeholder={`You can transfer any sum less or equal to: ${currentTransaction.sum}₪`}
+        placeholder={`You can transfer any sum less or equal to: ${transferTx.sum}₪`}
       />
 
       <ThemeProvider theme={theme}>

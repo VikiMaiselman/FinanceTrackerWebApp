@@ -4,16 +4,17 @@ import { Fab } from "@mui/material";
 import { HexColorPicker } from "react-colorful";
 
 import "../../styles/Form.css";
+import { FinanceContext } from "../../contexts/Finance.context";
 
-export default function CreateSubtypeForm({ actions }) {
+export default function CreateSubtypeForm({  }) {
+  const { addSubtype } = React.useContext(FinanceContext);
+
   const [color, setColor] = useState("");
   const [data, setData] = useState({
     subtName: "",
     tName: "",
   });
-
-  const { addSubtype } = actions;
-
+  
   const handleChange = (event) => {
     const { name, value } = event.target;
 

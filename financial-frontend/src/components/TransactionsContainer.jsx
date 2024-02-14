@@ -8,12 +8,8 @@ export default function TransactionsContainer({
   transactionsToDisplay,
   type,
   setShouldShowModal,
-  setTransactionDealtWith
+  setTransferTx,
 }) {
-  const metadataForNewTransaction = {
-    type: type,
-  };
-
   return (
     <div className="TransactionsContainer">
       <h2>My {type.name}:</h2>
@@ -34,15 +30,13 @@ export default function TransactionsContainer({
             key={tx._id}
             isFullVersion={isFullVersion}
             txData={tx}
-            metadata={metadataForNewTransaction}
+            type={type}
             setShouldShowModal={setShouldShowModal}
-            setTransactionDealtWith={setTransactionDealtWith}
+            setTransferTx={setTransferTx}
           />
         );
       })}
-      {isFullVersion && (
-        <CreateTransactionForm metadata={metadataForNewTransaction} />
-      )}
+      {isFullVersion && <CreateTransactionForm type={type} />}
     </div>
   );
 }

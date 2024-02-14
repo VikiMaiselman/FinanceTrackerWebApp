@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthContext } from "../contexts/Auth.context";
@@ -18,35 +18,7 @@ import { FinanceContext } from "../contexts/Finance.context";
 
 export default function AppRouter() {
   const auth = React.useContext(AuthContext);
-
-  //  financeState,
-  // fetchData,
-  // addTransaction,
-  // updateTransaction,
-  // removeTransaction,
-  // transfer,
-  // error,
-  // errorHandler,
-  const { financeState, fetchData, addTransaction, error } =
-    React.useContext(FinanceContext);
-
-  console.log("got new finance state", financeState);
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [financeState]);
-
-  const colorTypes = ["#9A4444", "#D6D46D", "#DE8F5F"];
-  const data = financeState.generalStructure?.types?.map((type, idx) => {
-    const subtotal = financeState.allTransactions
-      .filter((tx) => tx.typeName === type.name)
-      .reduce((acc, tx) => acc + tx.sum, 0);
-    return {
-      name: type.name,
-      subtotal: subtotal,
-      fill: colorTypes[idx],
-    };
-  });
+  const { financeState, error } = React.useContext(FinanceContext);
 
   const toRender = financeState.generalStructure ? (
     auth.isAuthenticated ? (
@@ -55,50 +27,20 @@ export default function AppRouter() {
 
         <BrowserRouter>
           <Routes>
-            <Route
-              path="/"
-              index
-              element={
-                <MainPage
-                  // financeState={financeState}
-                  updatePage={fetchData}
-                  dataForChart={data}
-                  // actions={actions}
-                />
-              }
-            />
+            <Route path="/" index element={<MainPage />} />
             <Route
               path="expenses"
-              element={
-                <FinancialInfoPage
-                  financeState={financeState}
-                  dataForChart={data}
-                  typeName="Expenses"
-                />
-              }
+              element={<FinancialInfoPage typeName="Expenses" />}
             />
             <Route
               path="incomes"
-              element={
-                <FinancialInfoPage
-                  financeState={financeState}
-                  typeName="Incomes"
-                />
-              }
+              element={<FinancialInfoPage typeName="Incomes" />}
             />
             <Route
               path="savings"
-              element={
-                <FinancialInfoPage
-                  financeState={financeState}
-                  typeName="Savings"
-                />
-              }
+              element={<FinancialInfoPage typeName="Savings" />}
             />
-            <Route
-              path="wishes"
-              element={<Wishes fulfillWish={addTransaction} />}
-            />
+            <Route path="wishes" element={<Wishes />} />
             <Route path="logout" element={<Logout />} />
             <Route
               path="*"

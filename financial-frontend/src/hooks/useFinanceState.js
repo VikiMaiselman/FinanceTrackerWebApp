@@ -2,7 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-import { url, headers, findTransactionsOfAMonth } from "../helpers";
+import {
+  url,
+  headers,
+  findTransactionsOfAMonth,
+} from "../helpers";
 import { MonthContext } from "../contexts/Month.context";
 
 export default function useFinanceState() {
@@ -27,11 +31,15 @@ export default function useFinanceState() {
         selectedDate
       );
 
+      const newFinancialState = {
+        allTransactions: transactionsOfThisMonth,
+        generalStructure: finance.generalStructure,
+      };
+
       setFinanceState((prevState) => {
         return {
           ...prevState,
-          allTransactions: transactionsOfThisMonth,
-          generalStructure: finance.generalStructure,
+          ...newFinancialState,
         };
       });
     } catch (error) {
@@ -189,6 +197,95 @@ export default function useFinanceState() {
     }
   };
 
+  const addSubtype = async (newSubtype) => {
+    if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
+      Swal.fire({
+        title: "Ooops!",
+        text: "Fill in all the fields, please.",
+        icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
+      });
+      return;
+    }
+    const dataForBackend = {
+      newSubtype: newSubtype,
+      typeName: newSubtype.typeName,
+    };
+
+    try {
+      await axios.post(
+        `${url}/addSubtype`,
+        dataForBackend,
+        { withCredentials: true },
+        headers
+      );
+      Swal.fire({
+        title: "Success!",
+        text: "Category added successfully",
+        icon: "success",
+        confirmButtonColor: "#5f6f52",
+        iconColor: "#5f6f52",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops!",
+        text: error.response.data,
+        icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
+      });
+    }
+
+    await fetchData();
+  };
+
+  const removeSubtype = async (subtype, typeName) => {
+    if (!subtype || !typeName) {
+      Swal.fire({
+        title: "Ooops!",
+        text: "Fill in all the fields, please.",
+        icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
+      });
+      return;
+    }
+
+    const dataForBackend = {
+      subtype: subtype,
+      typeName: typeName,
+    };
+
+    try {
+      await axios.post(
+        `${url}/removeSubtype`,
+        dataForBackend,
+        { withCredentials: true },
+        headers
+      );
+      Swal.fire({
+        title: "Success!",
+        text: "Category removed successfully",
+        icon: "success",
+        confirmButtonColor: "#5f6f52",
+        iconColor: "#5f6f52",
+      });
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        title: "Ooops!",
+        text: error.response.data,
+        icon: "error",
+        confirmButtonColor: "rgb(154, 68, 68)",
+        iconColor: "rgb(154, 68, 68)",
+      });
+    }
+
+    await fetchData();
+  };
+
   return [
     financeState,
     fetchData,
@@ -196,6 +293,8 @@ export default function useFinanceState() {
     updateTransaction,
     removeTransaction,
     transfer,
+    addSubtype,
+    removeSubtype,
     error,
     errorHandler,
   ];

@@ -3,17 +3,13 @@ import DoneSharpIcon from "@mui/icons-material/DoneSharp";
 import "../../styles/Form.css";
 import { FinanceContext } from "../../contexts/Finance.context";
 
-export default function UpdateTransactionForm({
-  txData,
-  metadata,
-  setIsEditable,
-}) {
+export default function UpdateTransactionForm({ txData, type, setIsEditable }) {
   const [tx, setTx] = useState({
     _id: txData._id,
     name: txData.name,
     sum: txData.sum,
     subtypeName: txData.subtypeName,
-    typeName: metadata.type.name,
+    typeName: type.name,
   });
 
   const { updateTransaction } = React.useContext(FinanceContext);
@@ -47,14 +43,14 @@ export default function UpdateTransactionForm({
       <input
         name="subtypeName"
         value={tx.subtypeName}
-        list={metadata.type.subtypes}
+        list={type.subtypes}
         placeholder="Select an option.."
         onChange={handleChange}
         onFocus={handleFocus}
         autoComplete="off"
       />
-      <datalist id={metadata.type.subtypes}>
-        {metadata.type.subtypes.map((subtype) => {
+      <datalist id={type.subtypes}>
+        {type.subtypes.map((subtype) => {
           return (
             <option key={subtype.name} id={subtype.name} value={subtype.name} />
           );

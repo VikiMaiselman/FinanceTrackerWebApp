@@ -6,12 +6,12 @@ import "../../styles/Form.css";
 
 import { FinanceContext } from "../../contexts/Finance.context";
 
-export default function CreateTransactionForm({ metadata }) {
+export default function CreateTransactionForm({ type }) {
   const [tx, setTx] = useState({
     name: "",
     sum: "",
     subtypeName: "",
-    typeName: metadata.type.name,
+    typeName: type.name,
   });
 
   const { addTransaction } = React.useContext(FinanceContext);
@@ -46,7 +46,7 @@ export default function CreateTransactionForm({ metadata }) {
         name: "",
         sum: "",
         subtypeName: "",
-        typeName: metadata.type.name,
+        typeName: type.name,
       });
       return;
     }
@@ -55,7 +55,7 @@ export default function CreateTransactionForm({ metadata }) {
       name: "",
       sum: "",
       subtypeName: "",
-      typeName: metadata.type.name,
+      typeName: type.name,
     });
   };
 
@@ -81,14 +81,14 @@ export default function CreateTransactionForm({ metadata }) {
         name="subtypeName"
         id="subtype"
         value={tx.subtypeName}
-        list={`datalist-${metadata.type.name}`}
+        list={`datalist-${type.name}`}
         placeholder="Select category..."
         onChange={handleChange}
         onFocus={handleFocus}
         autoComplete="off"
       />
-      <datalist id={`datalist-${metadata.type.name}`}>
-        {metadata.type.subtypes.map((subtype) => {
+      <datalist id={`datalist-${type.name}`}>
+        {type.subtypes.map((subtype) => {
           return <option key={subtype._id} value={subtype.name} />;
         })}
       </datalist>

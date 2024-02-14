@@ -19,118 +19,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
 import { MonthContext } from "../contexts/Month.context";
-import useFinanceState from "../hooks/useFinanceState";
 import { FinanceContext } from "../contexts/Finance.context";
 
-const url = "http://localhost:3007";
-const headers = {
-  "Content-Type": "application/json",
-  "Access-Control-Allow-Origin": "http://localhost:3000",
-};
 
-export default function MainPage({ dataForChart, updatePage }) {
+export default function MainPage() {
   const { theme } = React.useContext(CustomThemeContext);
   const { selectedDate, handleDataChange, handlePrevMonth, handleNextMonth } =
     React.useContext(MonthContext);
-
-  const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [transactionOfTransfer, setTransactionDealtWith] = useState({});
-
   const { financeState } = React.useContext(FinanceContext);
 
-  const addSubtype = async (newSubtype) => {
-    if (!newSubtype.name || !newSubtype.color || !newSubtype.typeName) {
-      Swal.fire({
-        title: "Ooops!",
-        text: "Fill in all the fields, please.",
-        icon: "error",
-        confirmButtonColor: "rgb(154, 68, 68)",
-        iconColor: "rgb(154, 68, 68)",
-      });
-      return;
-    }
-    const dataForBackend = {
-      newSubtype: newSubtype,
-      typeName: newSubtype.typeName,
-    };
-
-    try {
-      await axios.post(
-        `${url}/addSubtype`,
-        dataForBackend,
-        { withCredentials: true },
-        headers
-      );
-      Swal.fire({
-        title: "Success!",
-        text: "Category added successfully",
-        icon: "success",
-        confirmButtonColor: "#5f6f52",
-        iconColor: "#5f6f52",
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Ooops!",
-        text: error.response.data,
-        icon: "error",
-        confirmButtonColor: "rgb(154, 68, 68)",
-        iconColor: "rgb(154, 68, 68)",
-      });
-    }
-
-    await updatePage();
-  };
-
-  const removeSubtype = async (subtype, typeName) => {
-    if (!subtype || !typeName) {
-      Swal.fire({
-        title: "Ooops!",
-        text: "Fill in all the fields, please.",
-        icon: "error",
-        confirmButtonColor: "rgb(154, 68, 68)",
-        iconColor: "rgb(154, 68, 68)",
-      });
-      return;
-    }
-
-    const dataForBackend = {
-      subtype: subtype,
-      typeName: typeName,
-    };
-
-    try {
-      await axios.post(
-        `${url}/removeSubtype`,
-        dataForBackend,
-        { withCredentials: true },
-        headers
-      );
-      Swal.fire({
-        title: "Success!",
-        text: "Category removed successfully",
-        icon: "success",
-        confirmButtonColor: "#5f6f52",
-        iconColor: "#5f6f52",
-      });
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Ooops!",
-        text: error.response.data,
-        icon: "error",
-        confirmButtonColor: "rgb(154, 68, 68)",
-        iconColor: "rgb(154, 68, 68)",
-      });
-    }
-
-    await updatePage();
-  };
-
-  const actionsWithCats = {
-    addSubtype: addSubtype,
-    removeSubtype: removeSubtype,
-  };
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [transferTx, setTransferTx] = useState({});
 
   return (
     financeState && (
@@ -139,9 +38,7 @@ export default function MainPage({ dataForChart, updatePage }) {
           My Total Financial State: {financeState.generalStructure.total}₪
         </h1>
 
-        {financeState.generalStructure.total !== 0 && (
-          <CustomBarChart data={dataForChart} />
-        )}
+        {financeState.generalStructure.total !== 0 && <CustomBarChart />}
 
         <div>
           <h1 style={{ fontWeight: "lighter" }}>My transactions as of: </h1>
@@ -205,7 +102,7 @@ export default function MainPage({ dataForChart, updatePage }) {
                   transactionsToDisplay={transactionsOfThisType}
                   type={type}
                   setShouldShowModal={setShouldShowModal}
-                  setTransactionDealtWith={setTransactionDealtWith}
+                  setTransferTx={setTransferTx}
                 />
               </Grid>
             );
@@ -218,11 +115,8 @@ export default function MainPage({ dataForChart, updatePage }) {
             analytics and planification:
           </h2>
           <div className="ManageSubtypes">
-            <CreateSubtypeForm actions={actionsWithCats} />
-            <RemoveSubtypeForm
-              types={financeState.generalStructure.types}
-              actions={actionsWithCats}
-            />
+            <CreateSubtypeForm />
+            <RemoveSubtypeForm types={financeState.generalStructure.types} />
           </div>
         </div>
         <Modal
@@ -235,7 +129,7 @@ export default function MainPage({ dataForChart, updatePage }) {
             after saving." W.Baffet
           </p>
           <TransferForm
-            currentTransaction={transactionOfTransfer}
+            transferTx={transferTx}
             setShouldShowModal={setShouldShowModal}
           />
         </Modal>

@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Fab } from "@mui/material";
 import "../../styles/Form.css";
+import { FinanceContext } from "../../contexts/Finance.context";
 
-export default function RemoveSubtypeForm({ types, actions }) {
+export default function RemoveSubtypeForm({ types }) {
+  const { removeSubtype } = React.useContext(FinanceContext);
+
   const [subtype, setSubtype] = useState({
     name: "",
   });
   const [type, setType] = useState("");
-
-  const { removeSubtype } = actions;
 
   const handleChange = (event) => {
     const { name, value } = event.target;

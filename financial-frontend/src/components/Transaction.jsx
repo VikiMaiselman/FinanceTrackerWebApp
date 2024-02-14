@@ -11,9 +11,9 @@ import { FinanceContext } from "../contexts/Finance.context";
 export default function Transaction({
   isFullVersion,
   txData,
-  metadata,
+  type,
   setShouldShowModal,
-  setTransactionDealtWith,
+  setTransferTx,
 }) {
   const { removeTransaction } = React.useContext(FinanceContext);
   const { name, sum, date, subtypeName } = txData;
@@ -23,7 +23,7 @@ export default function Transaction({
   const whatToRender = isEditable ? (
     <UpdateTransactionForm
       txData={txData}
-      metadata={metadata}
+      type={type}
       setIsEditable={setIsEditable}
     />
   ) : (
@@ -35,15 +35,14 @@ export default function Transaction({
       {isFullVersion && (
         <div className="Transaction-data">
           {isFullVersion &&
-          (metadata.type.name === "Incomes" ||
-            metadata.type.name === "Savings") ? (
+          (type.name === "Incomes" || type.name === "Savings") ? (
             <Tooltip title="Transfer">
               <button
                 className="Transaction-handlerBtn"
                 onClick={(event) => {
                   event.preventDefault();
                   setShouldShowModal(true);
-                  setTransactionDealtWith(txData);
+                  setTransferTx(txData);
                 }}
               >
                 <SyncAltIcon sx={{ color: "#706233" }} />

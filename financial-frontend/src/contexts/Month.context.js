@@ -7,8 +7,6 @@ export default function MonthProvider({ children }) {
   const [selectedDate, handleDataChange, handlePrevMonth, handleNextMonth] =
     useMonthState();
 
-  console.log("context inititalized", selectedDate);
-
   const contextValue = React.useMemo(
     () => ({
       selectedDate,

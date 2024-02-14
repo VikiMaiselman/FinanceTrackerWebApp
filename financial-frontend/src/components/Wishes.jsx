@@ -20,7 +20,6 @@ const headers = {
 
 export default function Wishes() {
   const { theme } = React.useContext(CustomThemeContext);
-
   const { transfer } = useFinanceState();
 
   const [shouldShowModal, setShouldShowModal] = useState(false);
