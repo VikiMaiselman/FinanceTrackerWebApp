@@ -67,8 +67,7 @@ export default function FinancialInfoPage({ typeName }) {
           sx={{ minWidth: "max-content" }}
           title={
             <h3>
-              Total {typeName} (all months):{" "}
-              {Math.sign(typeTotal) === -1 ? typeTotal * -1 : typeTotal}₪
+              Total {typeName} (all months): {Math.abs(typeTotal)}₪
             </h3>
           }
         >

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import AddCircleOutlineSharpIcon from "@mui/icons-material/AddCircleOutlineSharp";
 import CurrencyExchangeSharpIcon from "@mui/icons-material/CurrencyExchangeSharp";
@@ -9,61 +10,61 @@ import AccountBalanceSharpIcon from "@mui/icons-material/AccountBalanceSharp";
 export default function Navbar() {
   const [isFixed, setIsFixed] = useState(false);
 
-  const defineIfFixed = () => {
-    if (window.scrollY >= 50) setIsFixed(true);
-    if (window.scrollY < 50) setIsFixed(false);
-  };
-  window.addEventListener("scroll", defineIfFixed);
+  const defineIfFixed = () => setIsFixed(window.scrollY >= 50);
+
+  useEffect(() => {
+    window.addEventListener("scroll", defineIfFixed);
+    return () => window.removeEventListener("scroll", defineIfFixed);
+  }, []);
 
   return (
     <ul className={isFixed ? "Navbar scroll" : "Navbar"}>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/">
+        <Link to="/">
           <AccountBalanceSharpIcon
             sx={{ fontSize: "1rem", verticalAlign: "-2px" }}
           />
           &nbsp;All Finance
-        </a>
+        </Link>
       </li>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/savings">
-          {" "}
+        <Link to="/savings">
           <SavingsOutlinedIcon
             sx={{ fontSize: "1rem", verticalAlign: "-2px" }}
           />
           &nbsp;Savings
-        </a>
+        </Link>
       </li>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/incomes">
+        <Link to="/incomes">
           <AddCircleOutlineSharpIcon
             sx={{ fontSize: "1rem", verticalAlign: "-2px" }}
           />
           &nbsp;Incomes
-        </a>
+        </Link>
       </li>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/expenses">
+        <Link to="/expenses">
           {" "}
           <CurrencyExchangeSharpIcon
             sx={{ fontSize: "1rem", verticalAlign: "-2px" }}
           />
           &nbsp;Expenses
-        </a>
+        </Link>
       </li>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/wishes">
+        <Link to="/wishes">
           <ReorderTwoToneIcon
             sx={{ fontSize: "1rem", verticalAlign: "-2px" }}
           />
           &nbsp;Wishes
-        </a>
+        </Link>
       </li>
       <li className="Navbar-component">
-        <a href="http://localhost:3000/logout">
+        <Link href="/logout">
           <LogoutSharpIcon sx={{ fontSize: "1rem", verticalAlign: "-2px" }} />
           &nbsp;Logout
-        </a>
+        </Link>
       </li>
     </ul>
   );
