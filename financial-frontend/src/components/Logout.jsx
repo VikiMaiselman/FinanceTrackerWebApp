@@ -6,10 +6,8 @@ import { AuthContext } from "../contexts/Auth.context";
 export default function Logout() {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
-
   useEffect(() => {
     const logout = async () => {
-      console.log("hi");
       await auth.logout();
     };
     logout();

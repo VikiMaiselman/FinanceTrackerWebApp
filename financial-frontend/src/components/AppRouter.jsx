@@ -24,8 +24,6 @@ export default function AppRouter() {
     auth.isAuthenticated ? (
       <div className="AllTransactions">
         <Navbar />
-
-        {/* <BrowserRouter> */}
         <Routes>
           <Route path="/" index element={<MainPage />} />
           <Route
@@ -54,7 +52,6 @@ export default function AppRouter() {
             }
           />
         </Routes>
-        {/* </BrowserRouter> */}
       </div>
     ) : (
       <Login />

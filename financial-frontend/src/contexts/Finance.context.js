@@ -17,8 +17,6 @@ export default function FinanceProvider({ children }) {
     errorHandler,
   ] = useFinanceState();
 
-  console.log("FinanceContext called");
-
   return (
     <FinanceContext.Provider
       value={{

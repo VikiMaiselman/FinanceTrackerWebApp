@@ -61,7 +61,7 @@ export default function Navbar() {
         </Link>
       </li>
       <li className="Navbar-component">
-        <Link href="/logout">
+        <Link to="/logout">
           <LogoutSharpIcon sx={{ fontSize: "1rem", verticalAlign: "-2px" }} />
           &nbsp;Logout
         </Link>
