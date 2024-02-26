@@ -2,12 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
-import {
-  url,
-  headers,
-  findTransactionsOfAMonth,
-} from "../helpers";
+import { url, headers, findTransactionsOfAMonth } from "../helpers";
 import { MonthContext } from "../contexts/Month.context";
+import { AuthContext } from "../contexts/Auth.context";
 
 export default function useFinanceState() {
   const [financeState, setFinanceState] = useState({
@@ -20,6 +17,7 @@ export default function useFinanceState() {
   });
 
   const { selectedDate } = useContext(MonthContext);
+  const auth = useContext(AuthContext);
 
   const fetchData = async () => {
     try {
@@ -53,7 +51,7 @@ export default function useFinanceState() {
 
   useEffect(() => {
     (async () => await fetchData())();
-  }, [selectedDate]);
+  }, [selectedDate, auth.isAuthenticated]);
 
   const addTransaction = async (newTransaction) => {
     try {

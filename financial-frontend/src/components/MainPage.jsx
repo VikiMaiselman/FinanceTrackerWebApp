@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import Swal from "sweetalert2";
-import axios from "axios";
 import { Grid, Button, Tooltip } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import SwipeLeftIcon from "@mui/icons-material/SwipeLeft";
@@ -20,7 +18,6 @@ import { format } from "date-fns";
 import { CustomThemeContext } from "../contexts/CustomTheme.context";
 import { MonthContext } from "../contexts/Month.context";
 import { FinanceContext } from "../contexts/Finance.context";
-
 
 export default function MainPage() {
   const { theme } = React.useContext(CustomThemeContext);

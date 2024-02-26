@@ -11,3 +11,14 @@
 #root {
   height: 100%;
 }
+
+input {
+  transition: all 0.4ms ease-in-out;
+}
+input:hover {
+  transform: scale(1.05);
+}
+input:focus {
+  border: none;
+  outline: 0;
+}

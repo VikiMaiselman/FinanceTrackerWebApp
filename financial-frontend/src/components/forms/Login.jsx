@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FormHelperText, InputLabel, Button } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import { ThemeProvider } from "@mui/material/styles";
 
 import Swal from "sweetalert2";
@@ -56,60 +57,73 @@ export default function Login() {
   };
 
   return (
-    <div className="AllTransactions">
-      <h1>Login | Register</h1>
-      <form className="Auth-form">
-        <InputLabel htmlFor="username">*Username:</InputLabel>
-        <input
-          onChange={handleChange}
-          id="username"
-          name="username"
-          value={user.username}
-          autoComplete="off"
-          required
+    <div className="login-container">
+      <div className="login-form">
+        {/* <h1 className="login-header">Login | Register</h1> */}
+        <form className="Auth-form">
+          <h1 className="login-header">Login | Register</h1>
+          <InputLabel htmlFor="username">*Username:</InputLabel>
+          <input
+            onChange={handleChange}
+            id="username"
+            name="username"
+            value={user.username}
+            autoComplete="off"
+            required
+          />
+
+          <InputLabel htmlFor="password">*Password:</InputLabel>
+          <input
+            onChange={handleChange}
+            name="password"
+            value={user.password}
+            type={"password"}
+            autoComplete="off"
+            required
+          />
+
+          <FormHelperText>
+            We won't use your information. Your financial operations will be
+            stored safely.
+          </FormHelperText>
+
+          <div className="Auth-btns">
+            <ThemeProvider theme={theme}>
+              <Button
+                className="Auth-btn"
+                onClick={handleLoginClick}
+                variant="contained"
+                color="login"
+              >
+                <LoginIcon /> Login
+              </Button>
+            </ThemeProvider>
+
+            <ThemeProvider theme={theme}>
+              <Button
+                className="Auth-btn"
+                onClick={handleRegisterClick}
+                variant="contained"
+                color="register"
+              >
+                <HowToRegIcon />
+                {"  "}
+                Signup
+              </Button>
+            </ThemeProvider>
+          </div>
+        </form>
+      </div>
+
+      <div className="right-side">
+        <AssignmentIndIcon
+          className="login-page-icon"
+          style={{ fontSize: "10rem" }}
         />
-
-        <InputLabel htmlFor="password">*Password:</InputLabel>
-        <input
-          onChange={handleChange}
-          name="password"
-          value={user.password}
-          type={"password"}
-          autoComplete="off"
-          required
-        />
-
-        <FormHelperText>
-          We won't use your information. We just want to save your financial
-          information safely.
-        </FormHelperText>
-
-        <div className="Auth-btns">
-          <ThemeProvider theme={theme}>
-            <Button
-              className="Auth-btn"
-              onClick={handleLoginClick}
-              variant="contained"
-              color="login"
-            >
-              <LoginIcon /> Login
-            </Button>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-            <Button
-              className="Auth-btn"
-              onClick={handleRegisterClick}
-              variant="contained"
-              color="register"
-            >
-              <HowToRegIcon />
-              {"  "}
-              Signup
-            </Button>
-          </ThemeProvider>
-        </div>
-      </form>
+        <h1 className="login-header">Financial Tracker App</h1>
+        <h4>Manage all your financial data in one place</h4>
+        <h5>Track your incomes & expenses and many more...</h5>
+      </div>
     </div>
   );
 }
